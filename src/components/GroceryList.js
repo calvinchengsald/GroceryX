@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import Messege from './Messege';
+import GroceryListItem from './GroceryListItem';
 
 class GroceryList extends Component {
 
@@ -25,24 +26,7 @@ class GroceryList extends Component {
 
     if(this.props.match.params.groceryListId){
       this.groceryListId = this.props.match.params.groceryListId;
-      let myurl = `${process.env.REACT_APP_API_URL}groceryList/${this.groceryListId}`;
-      let bodyFormData = new Object();
-      bodyFormData.needJSONbreakup = "J$0nBr4k3";
-      this.fetchData(myurl,bodyFormData, (err,data)=>{
-        if(err){
-          this.setState({
-            messege: err,
-            groceryListData: data,
-            loading: false,
-          });
-        }
-        else {
-          this.setState({
-            groceryListData : data,
-            loading: false,
-          });
-        }
-      })
+      this.updateList();
     }
   }
   componentDidUpdate(){
@@ -75,7 +59,79 @@ class GroceryList extends Component {
     });
   }
 
+  checkBox = (e) =>{
+    let ids = e.target.id.split('%');
+    if(!e.target.checked){    //checked
+      if(ids[1] && ids[1] == this.props.appModel.userModel.id){
+        let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${ids[0]}`;
+        let bodyFormData = new Object();
+        bodyFormData.purchased=false;
+        bodyFormData.needJSONbreakup = "J$0nBr4k3";
+        this.fetchData(myurl,bodyFormData, (err,data)=>{
+          if(err){
+            this.setState({
+              messege: err,
+            });
+          }
+          else {
+            this.updateList();
+          }
+        })
+      }
+      else {
+        this.setState({
+          messege : "That has already been purchased"
+        });
+      }
+    }
+    else {
+      let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${ids[0]}`;
+      let bodyFormData = new Object();
+      bodyFormData.purchased=true;
+      bodyFormData.userId = this.props.appModel.userModel.id;
+      bodyFormData.needJSONbreakup = "J$0nBr4k3";
+      this.fetchData(myurl,bodyFormData, (err,data)=>{
+        if(err){
+          this.setState({
+            messege: err,
+          });
+        }
+        else {
+          this.updateList();
+        }
+      })
+    }
+  }
+  updateList(){
+    let myurl = `${process.env.REACT_APP_API_URL}groceryList/${this.groceryListId}`;
+    let bodyFormData = new Object();
+    bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    this.fetchData(myurl,bodyFormData, (err,data)=>{
+      if(err){
+        this.setState({
+          messege: err,
+          groceryListData: data,
+          loading: false,
+        });
+      }
+      else {
+        this.orderGroceryListData(data);
+        this.setState({
+          groceryListData : data,
+          loading: false,
+        });
 
+      }
+    })
+  }
+  orderGroceryListData(data){
+    data.groceries.sort( (a, b) => {
+      if( a.priority === b.priority){
+        return a.name > b.name ? 1 : -1
+      }
+      return a.priority - b.priority;
+    });
+  }
 
   render() {
     if(!this.props.appModel.userModel.login){
@@ -104,13 +160,25 @@ class GroceryList extends Component {
                       {this.state.groceryListData.name}
                     </h1>
                     <div className='row'>
-                      <div className='col-8 m-1 border bg-light'>
-                        {this.state.groceryListData.groceries.map((grocery)=>{
-                          return <div className='row'>
-                            <div className='col-12' >
-                              {grocery.name}
+                      <div className='col-12 m-1 border bg-light'>
+                        <div className='row border border-primary'>
+                            <div className='col-1'>
                             </div>
-                          </div>
+                            <div className='col-4'> Item
+                            </div>
+                            <div className='col-1'> Budget
+                            </div>
+                            <div className='col-2'> Priority
+                            </div>
+                            <div className='col-4'> Buyer
+                            </div>
+                        </div>
+                        {this.state.groceryListData.groceries.map((grocery,index)=>{
+                          return <GroceryListItem key={`grocerylistitem-${index}`}
+                            item={grocery}
+                            checkBox ={this.checkBox}
+                            appModel = {this.props.appModel}
+                          />
                         })}
                       </div>
 
