@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
-import axios from "axios";
+import Messege from './Messege';
+import {Link} from 'react-router-dom';
 
 class Profile extends Component {
 
@@ -9,7 +10,8 @@ class Profile extends Component {
     super(props);
     this.base = process.env.REACT_APP_API_URL;
     this.state=({
-      loading:true
+      loading:true,
+      messege: "dummy",
     })
     this.initializeUser();
   }
@@ -85,6 +87,11 @@ class Profile extends Component {
   render() {
    return (
      <section className='Profile row'>
+         <div className='col-12'>
+           <Messege
+             messege ={this.state.messege }
+           />
+         </div>
         <div className='col-10 offset-1 mt-4'>
           {this.state.loading?
             <div> loading </div>
@@ -99,6 +106,40 @@ class Profile extends Component {
                 </div>
                 <div className='row'>
                   <div className='col-12 justify-content-center'> {this.state.userProfile.username} </div>
+                </div>
+                <div className='row'>
+                  <div className='col-6'>
+                    <div className='row p4 border bg-light'>
+                      <div className='col-12'>
+                        <div className='row justify-content-center text-primary'>
+                          Groups
+                        </div>
+                        {this.state.userProfile.groupusers.map((groupuser,index)=>{
+                          return <div key={`groupuser-${index}`} className='row'>
+                            <Link className='col-12' to={`/group/${groupuser.group.id}`}>
+                              {groupuser.group.groupName}
+                            </Link>
+                          </div>
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <div className='col-6'>
+                    <div className='row p4 border bg-light'>
+                      <div className='col-12'>
+                        <div className='row justify-content-center text-primary'>
+                          Grocery Lists
+                        </div>
+                        {this.state.userProfile.grocerylists.map((grocerylist,index)=>{
+                          return <div key={`groupuser-${index}`} className='row'>
+                            <Link className='col-12' to={`/grocerylist/${grocerylist.id}`}>
+                              {grocerylist.name}
+                            </Link>
+                          </div>
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
               </div>

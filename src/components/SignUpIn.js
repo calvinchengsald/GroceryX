@@ -45,7 +45,6 @@ class SignUpIn extends Component {
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
       bodyFormData.username = this.refSignInUsername.current.value;
       bodyFormData.password = this.refSignInPassword.current.value;
-      console.log(JSON.stringify(bodyFormData));
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
           this.setState({
@@ -57,6 +56,7 @@ class SignUpIn extends Component {
           this.props.appModel.userModel.username = data.username;
           this.props.appModel.userModel.login = true;
           this.props.appModel.userModel.id = data.id;
+          this.props.appModel.userModel.setUserData(data);
           this.setState({
             messege: "Welcome "+data.name
           });
@@ -94,7 +94,6 @@ class SignUpIn extends Component {
       bodyFormData.username = this.refSignUpUsername.current.value;
       bodyFormData.password = this.refSignUpPassword.current.value;
       bodyFormData.name = this.refSignUpName.current.value;
-      console.log(JSON.stringify(bodyFormData));
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
           this.setState({
@@ -107,6 +106,7 @@ class SignUpIn extends Component {
           this.props.appModel.userModel.username = data.username;
           this.props.appModel.userModel.login = true;
           this.props.appModel.userModel.id = data.id;
+          this.props.appModel.userModel.setUserData(data);
           this.setState({
             messege: "Account Created!\nWelcome "+data.name
           });

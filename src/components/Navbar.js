@@ -24,14 +24,9 @@ class Navbar extends Component {
             </div>
           }
 
+        
           <div className='row justify-content-center'>
-            <Link to='/' >Landing </Link>
-          </div>
-          <div className='row justify-content-center'>
-            <Link to='/Profile' >Profile </Link>
-          </div>
-          <div className='row justify-content-center'>
-            <Link to='/Groups' >Groups </Link>
+            <Link to='/Group' >Group </Link>
           </div>
 
         </div>

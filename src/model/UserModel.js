@@ -7,7 +7,12 @@ class UserModel {
     this.name = "calvin";
     this.password = 'temp';
     this.username = "kewl";
-    this.id;
+  //  this.id;
+  //  this.userData;
+  }
+
+  setUserData(data){
+    this.userData = Object.assign({},data);
   }
 
 }
