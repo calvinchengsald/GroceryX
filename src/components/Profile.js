@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import Messege from './Messege';
 import {Link} from 'react-router-dom';
+import $ from "jquery";
 
 class Profile extends Component {
 
@@ -39,26 +40,30 @@ class Profile extends Component {
     // if(!this.props.appModel.userModel.login){
     //   this.props.history.push('/SignUpIn');
     // }
+    // console.log(this.props.appModel.userModel.login && this.props.appModel.userModel.userData.id==this.props.match.params.id));
+    // console.log(this.props.appModel.userModel.login );
+    // console.log(this.props.appModel.userModel.login );
+
 
   }
   componentDidUpdate(){
-    let myurl = `${process.env.REACT_APP_API_URL}user/${this.props.match.params.id}`;
-    let bodyFormData = new Object();
-    bodyFormData.needJSONbreakup = "J$0nBr4k3";
-    this.fetchData(myurl,bodyFormData, (err,data)=>{
-      if(err){
-        this.setState({
-          messege: err,
-          loading: false
-        });
-      }
-      else {
-        this.setState({
-          userProfile : data,
-          loading: false
-        });
-      }
-    })
+    // let myurl = `${process.env.REACT_APP_API_URL}user/${this.props.match.params.id}`;
+    // let bodyFormData = new Object();
+    // bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    // this.fetchData(myurl,bodyFormData, (err,data)=>{
+    //   if(err){
+    //     this.setState({
+    //       messege: err,
+    //       loading: false
+    //     });
+    //   }
+    //   else {
+    //     this.setState({
+    //       userProfile : data,
+    //       loading: false
+    //     });
+    //   }
+    // })
   }
 
   fetchData(myurl,bodyFormData, callback){
@@ -84,6 +89,82 @@ class Profile extends Component {
 
 
 
+  changePassword = () =>{
+    if(!this.props.appModel.userModel.login){
+      return this.setState({
+        messege: "You need to sign in first"
+      });
+    }
+    if(this.props.appModel.userModel.userData.id != this.props.match.params.id){
+      return this.setState({
+        messege: "You are not authorized for this action"
+      });
+    }
+    let newPassword = $('#new-password').val();
+    if(newPassword !== $('#new-password-confirm').val()){
+      this.setState({
+        messege: "Passwords do not match"
+      });
+      return;
+    }
+    let oldPassword = $('#confirm-password').val();
+    let myurl = `${process.env.REACT_APP_API_URL}user/update/${this.props.appModel.userModel.userData.id}/password`;
+    let bodyFormData = new Object();
+    bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    bodyFormData.oldPassword = oldPassword;
+    bodyFormData.newPassword = newPassword;
+    bodyFormData.username = this.props.appModel.userModel.userData.username;
+    this.fetchData(myurl,bodyFormData, (err,data)=>{
+      if(err){
+        this.setState({
+          messege: err,
+          loading: false
+        });
+      }
+      else {
+        if(data.error){
+            this.setState({
+              messege:data.error
+            });
+            return;
+        }
+        else {
+            this.props.appModel.userModel.updateUserData();
+            this.setState({
+              userProfile : this.props.appModel.userModel.userData,
+              loading: false,
+              messege: "Password Changed",
+            });
+            $("#change-password-form").slideUp('400', function(){
+                $("#change-password-btn").slideDown();
+            });
+        }
+      }
+    })
+
+  }
+
+  showChangePassword = () => {
+    if(!this.props.appModel.userModel.login){
+      return this.setState({
+        messege: "You need to sign in first"
+      });
+    }
+    $('#change-password-form').removeClass('d-none');
+
+    $("#change-password-btn").slideUp('400', function(){
+        $("#change-password-form").slideDown();
+    });
+  }
+  hideChangePassword = () => {
+    $("#change-password-form").slideUp('400', function(){
+        $("#change-password-btn").slideDown();
+    });
+  }
+
+
+
+
   render() {
    return (
      <section className='Profile row'>
@@ -102,10 +183,27 @@ class Profile extends Component {
               :
               <div className='col-12'>
                 <div className='row'>
-                  <div className='col-12 justify-content-center'> {this.state.userProfile.name} </div>
+                  <div className='col-12 text-left'>Name: {this.state.userProfile.name} </div>
                 </div>
                 <div className='row'>
-                  <div className='col-12 justify-content-center'> {this.state.userProfile.username} </div>
+                  <div className='col-12  text-left'>Username: {this.state.userProfile.username} </div>
+                </div>
+                <div className='row'>
+                  <div id='change-password-btn' onClick={this.showChangePassword} className={`col-12  btn btn-secondary text-left `+((this.props.appModel.userModel.login && this.props.appModel.userModel.userData.id==this.props.match.params.id)? '' : ' d-none')} onClick={this.showChangePassword} >Change Password </div>
+                  <div id='change-password-form' onMouseLeave={this.hideChangePassword} className='col-12 d-none' >
+                    <div className='row'>
+                      <input type='password' id='confirm-password' className='col-6' placeholder="Password"/>
+                    </div>
+                    <div className='row'>
+                      <input type='password' id='new-password' className='col-6' placeholder="New Password"/>
+                    </div>
+                    <div className='row'>
+                      <input type='password' id='new-password-confirm' className='col-6' placeholder="Confirm New Password"/>
+                    </div>
+                    <div className='row'>
+                      <div className='col-6 btn btn-primary' onClick={this.changePassword}> Submit </div>
+                    </div>
+                  </div>
                 </div>
                 <div className='row'>
                   <div className='col-6'>

@@ -236,6 +236,11 @@ class GroceryList extends Component {
            />
          </div>
           <div className='col-10 offset-1 mt-4'>
+            {(this.state.groceryListData.private && this.state.groceryListData.ownerId !== this.props.appModel.userModel.userData.id)?
+              <div className='row'>
+                Sorry, This is a private list :(
+              </div>
+              :
               <div className='row'>
                 {this.state.groceryListData.error?
                   <div className='col-12'>
@@ -294,6 +299,7 @@ class GroceryList extends Component {
                   </div>
                 }
               </div>
+            }
           </div>
        </section>
       );

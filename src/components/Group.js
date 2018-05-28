@@ -22,6 +22,7 @@ class Group extends Component {
     this.refAddMemberUsername = React.createRef();
     this.refAddGroceryListName = React.createRef();
     this.refCreateGroupName = React.createRef();
+    this.refEditGroupName = React.createRef();
   }
 
 
@@ -41,6 +42,11 @@ class Group extends Component {
           });
         }
         else {
+          if(data.error){
+            return this.setState({
+              messege:data.error
+            });
+          }
           this.setState({
             groupData : data,
             groupView: true,
@@ -105,6 +111,61 @@ class Group extends Component {
     $('#toggle-create-group').removeClass('d-none');
     $('#create-group').addClass('d-none');
   }
+  hideEditGroupName =() =>{
+    $('#edit-group-name').addClass('d-none');
+    $('#group-name').removeClass('d-none');
+    this.editGroupName();
+  }
+  showEditGroupName = () =>{
+    if(this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
+      $('#edit-group-name').removeClass('d-none');
+      $('#group-name').addClass('d-none');
+      $('#edit-group-name').focus();
+    }
+  }
+  editGroupName(){
+    console.log("at editing");
+    if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
+      this.setState({
+        messege: "You are not authorized to do that"
+      });
+      return;
+    }
+    let editGroupName = this.refEditGroupName.current.value;
+
+    if(this.state.groupData.groupName === editGroupName){
+      return;
+    }
+    if(!editGroupName){
+      this.setState({
+        messege: "Please enter a valid group name",
+      })
+      return;
+    }
+    let myurl = `${process.env.REACT_APP_API_URL}group/update/${this.state.groupData.id}`;
+    let bodyFormData = new Object();
+    bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    bodyFormData.groupName = editGroupName;
+    this.fetchData(myurl,bodyFormData, (err,data)=>{
+      if(err){
+        this.setState({
+          messege: err,
+          groupView: true,
+        });
+      }
+      else {
+        if(data.error){
+          this.setState({
+            messege: data.error,
+            groupView: true,
+          })
+          return;
+        }
+        this.reloadGroupData();
+      }
+    })
+  }
+
   leaveGroup = () =>{
     if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
       this.setState({
@@ -304,10 +365,11 @@ class Group extends Component {
                   :
                   <div className='col-12'>
                     <div className='row justify-content-center'>
-                      <h1 className='col-8 offset-2'>
+                      <h1 id='group-name' className='col-8 offset-2' onClick={this.showEditGroupName}>
                         {this.state.groupData.groupName}
                       </h1>
-                      <div className='btn btn-danger col-2' onClick={this.leaveGroup}>
+                      <input id='edit-group-name' ref={this.refEditGroupName} onBlur={this.hideEditGroupName} defaultValue={this.state.groupData.groupName} className={`col-8 offset-2 d-none`}/>
+                      <div className={`btn btn-danger col-2 ` + (this.props.appModel.userModel.isPartOfGroup(this.state.groupData)?'':'d-none')} onClick={this.leaveGroup}>
                         Leave Group
                       </div>
                     </div>

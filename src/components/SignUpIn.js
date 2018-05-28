@@ -1,6 +1,5 @@
 
 import React, { Component } from 'react';
-import axios from "axios";
 import Messege from './Messege';
 
 class SignUpIn extends Component {
@@ -52,6 +51,11 @@ class SignUpIn extends Component {
           });
         }
         else {
+          if(data.error){
+            return this.setState({
+              messege: data.error
+            });
+          }
           this.props.appModel.userModel.name = data.name;
           this.props.appModel.userModel.username = data.username;
           this.props.appModel.userModel.login = true;
@@ -101,16 +105,22 @@ class SignUpIn extends Component {
           });
         }
         else {
-
-          this.props.appModel.userModel.name = data.name;
-          this.props.appModel.userModel.username = data.username;
-          this.props.appModel.userModel.login = true;
-          this.props.appModel.userModel.id = data.id;
-          this.props.appModel.userModel.setUserData(data);
-          this.setState({
-            messege: "Account Created!\nWelcome "+data.name
-          });
-          this.props.rerender();
+          if(data.error){
+            return this.setState({
+              messege: data.error
+            });
+          }
+          else {
+            this.props.appModel.userModel.name = data.name;
+            this.props.appModel.userModel.username = data.username;
+            this.props.appModel.userModel.login = true;
+            this.props.appModel.userModel.id = data.id;
+            this.props.appModel.userModel.setUserData(data);
+            this.setState({
+              messege: "Account Created!\nWelcome "+data.name
+            });
+            this.props.rerender();
+          }
         }
       })
     }
@@ -159,7 +169,7 @@ class SignUpIn extends Component {
               </div>
               <div className='row'>
                 <div className='col-3 offset-1'>Password: </div>
-                <input defaultValue="driver" placeholder='Password' ref={this.refSignInPassword} type='text' className='col-5 offset-1'/>
+                <input type='password' defaultValue="driver" placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1'/>
               </div>
               <div className='row justify-content-center'>
                 <div className='btn btn-primary' onClick={this.handleSignIn}> Sign In </div>
