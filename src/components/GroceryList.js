@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
 import Messege from './Messege';
 import GroceryListItem from './GroceryListItem';
+import $ from 'jquery';
 
 class GroceryList extends Component {
 
@@ -18,7 +19,7 @@ class GroceryList extends Component {
     this.initialize();
   }
   initialize(){
-
+    this.refEditGroceryListName = React.createRef();
   }
 
 
@@ -172,7 +173,7 @@ class GroceryList extends Component {
       if( a.priority === b.priority){
         return a.name > b.name ? 1 : -1
       }
-      return a.priority - b.priority;
+      return b.priority - a.priority;
     });
   }
   deleteGroceryListWarning = (e) =>{
@@ -220,6 +221,151 @@ class GroceryList extends Component {
   }
 
 
+
+
+  showAddItem = (e) =>{
+    $('#add-item-btn-show').addClass('d-none');
+    $('#add-item-btn-action').removeClass('d-none');
+    $('#priority-select').removeClass('d-none');
+    $('#budget-select').removeClass('d-none');
+    $('#name-select').removeClass('d-none');
+    $('#hide-add-item-btn').removeClass('d-none');
+  }
+  hideAddItem() {
+    $('#add-item-btn-show').removeClass('d-none');
+    $('#add-item-btn-action').addClass('d-none');
+    $('#priority-select').addClass('d-none');
+    $('#budget-select').addClass('d-none');
+    $('#name-select').addClass('d-none');
+    $('#hide-add-item-btn').addClass('d-none');
+  }
+  showEditGroceryListName = (e) =>{
+    $('#grocery-list-name').addClass('d-none');
+    $('#edit-grocery-list-name').removeClass('d-none').focus();
+  }
+  hideEditGroceryListName = (e) =>{
+    $('#grocery-list-name').removeClass('d-none');
+    $('#edit-grocery-list-name').addClass('d-none');
+    this.editGroceryListName();
+  }
+  editGroceryListName(){
+    if(!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
+      this.setState({
+        messege: "You are not authorized to do that"
+      });
+      return;
+    }
+    let editGroceryListName = this.refEditGroceryListName.current.value;
+
+    if(this.state.groceryListData.name === editGroceryListName){
+      return;
+    }
+    if(!editGroceryListName){
+      this.setState({
+        messege: "Please enter a valid list name",
+      })
+      return;
+    }
+    let myurl = `${process.env.REACT_APP_API_URL}groceryList/update/${this.state.groceryListData.id}`;
+    let bodyFormData = new Object();
+    bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    bodyFormData.name = editGroceryListName;
+    this.fetchData(myurl,bodyFormData, (err,data)=>{
+      if(err){
+        this.setState({
+          messege: err,
+        });
+      }
+      else {
+        if(data.error){
+          this.setState({
+            messege: data.error,
+          })
+          return;
+        }
+        this.updateList();
+      }
+    })
+  }
+  addItem = () =>{
+    let itemName = $('#name-select').val();
+    let itemBudget = $('#budget-select').val();
+    let itemPriority = $('#priority-select').val();
+    if(!itemName){
+      this.setState({
+        messege: "You must include an Item Name"
+      });
+    }
+    let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/create`;
+    let bodyFormData = new Object();
+    bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    bodyFormData.name = itemName;
+    bodyFormData.priority = itemPriority;
+    bodyFormData.userId = this.props.appModel.userModel.userData.id;
+    bodyFormData.groceryListId = this.state.groceryListData.id;
+    bodyFormData.purchased = false;
+    if(itemBudget){
+      bodyFormData.budget = itemBudget;
+    }
+    this.fetchData(myurl,bodyFormData, (err,data)=>{
+      if(err){
+        this.setState({
+          messege: err,
+          loading: false,
+        });
+      }
+      else {
+        if(data.error){
+          return this.setState({
+            messege: data.error,
+          });
+        }
+        this.updateList();
+        this.hideAddItem();
+      }
+    })
+  }
+  editItem(id,callback){
+    let itemName = $('#name-select-edit').val();
+    let itemBudget = $('#budget-select-edit').val();
+    let itemPriority = $('#priority-select-edit').val();
+    if(!itemName){
+      this.setState({
+        messege: "You must include an Item Name"
+      });
+      return callback(false);
+    }
+    let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${id}`;
+    let bodyFormData = new Object();
+    bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    bodyFormData.name = itemName;
+    bodyFormData.priority = itemPriority;
+    bodyFormData.purchased = false;
+    if(itemBudget){
+      bodyFormData.budget = itemBudget;
+    }
+    this.fetchData(myurl,bodyFormData, (err,data)=>{
+      if(err){
+        this.setState({
+          messege: err,
+          loading: false,
+        });
+        return callback(false);
+      }
+      else {
+        if(data.error){
+          this.setState({
+            messege: data.error,
+          });
+          return callback(false);
+        }
+        this.updateList();
+        return callback(true);
+      }
+    })
+  }
+
+
   render() {
     if(!this.props.appModel.userModel.login){
       this.props.history.push('/SignUpIn');
@@ -250,9 +396,10 @@ class GroceryList extends Component {
                   <div className='col-12'>
 
                     <div className='row justify-content-center'>
-                      <h1 className ='col-8 offset-2'>
+                      <h1 id='grocery-list-name' className='col-8 offset-2' onClick={this.showEditGroceryListName}>
                         {this.state.groceryListData.name}
                       </h1>
+                      <input id='edit-grocery-list-name' ref={this.refEditGroceryListName} onBlur={this.hideEditGroceryListName} defaultValue={this.state.groceryListData.name} className={`col-8 offset-2 d-none`}/>
                       <div className='col-2'>
                         <div className='btn btn-danger' onClick={this.deleteGroceryListWarning}>
                           Delete
@@ -290,8 +437,48 @@ class GroceryList extends Component {
                             appModel = {this.props.appModel}
                             setMessege = {(msg)=>this.setMessege(msg)}
                             deleteItem = {this.deleteItem}
+                            editItem = {(index, callback)=>this.editItem(index, callback)}
                           />
                         })}
+                        <div className='row justify-content-end'>
+                          <div className='col-1'>
+                            <div id='hide-add-item-btn' className='btn btn-danger d-none' onClick={()=>this.hideAddItem()}>
+                              X
+                            </div>
+                          </div>
+                          <div className='col-4'>
+                            <input type='text'  id='name-select' placeholder='Item Name' className='d-none' />
+                          </div>
+                          <div className='col-1'>
+                            <input type='number' min='1' max='10000' id='budget-select' placeholder='NA' className='d-none' />
+                          </div>
+                          <div className='col-1'>
+                            <select id='priority-select' className='d-none' defaultValue="0">
+                              <option value="0" >None</option>
+                              <option value="1" >1</option>
+                              <option value="2" >2</option>
+                              <option value="3" >3</option>
+                              <option value="4" >4</option>
+                              <option value="5" >5</option>
+                              <option value="6" >6</option>
+                              <option value="7" >7</option>
+                              <option value="8" >8</option>
+                              <option value="9" >9</option>
+                              <option value="10" >10</option>
+                            </select>
+                          </div>
+                          <div id='add-item-btn-show' className='col-2 offset-3' onClick={this.showAddItem}>
+                            <div className='btn btn-primary'>
+                              +
+                            </div>
+                          </div>
+                          <div id="add-item-btn-action" className='col-2 offset-3 d-none' onClick={this.addItem}>
+                            <div className='btn btn-primary'>
+                              Add Item
+                            </div>
+                          </div>
+
+                        </div>
                       </div>
 
                     </div>

@@ -124,7 +124,6 @@ class Group extends Component {
     }
   }
   editGroupName(){
-    console.log("at editing");
     if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
       this.setState({
         messege: "You are not authorized to do that"
@@ -447,8 +446,8 @@ class Group extends Component {
                       </div>
                     </div>
                     <div className='row'>
-                      {this.props.appModel.userModel.userData.groupusers.map((groupuser)=>{
-                        return <div className='col-6 justify-content-center'>
+                      {this.props.appModel.userModel.userData.groupusers.map((groupuser,index)=>{
+                        return <div key={`groupuser-ender-${index}`} className='col-6 justify-content-center'>
                           <div className='row m-2 bg-light border'>
                             <Link className='col-12' to={`/group/${groupuser.group.id}`}>
                               {groupuser.group.groupName}
