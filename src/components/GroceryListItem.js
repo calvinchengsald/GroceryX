@@ -23,21 +23,24 @@ class GroceryListItem extends Component {
         }
 
         {this.props.item.priority?
-          <div className='col-2'>
+          <div className='col-1'>
             {this.props.item.priority}
           </div>
           :
-          <div className='col-2'>
+          <div className='col-1'>
           </div>
         }
         {this.props.item.purchased?
-          <div className='col-4'>
+          <div className='col-3'>
             {this.props.item.buyer.name}
           </div>
           :
-          <div className='col-4'>
+          <div className='col-3'>
           </div>
         }
+        <div className='col-2 '>
+          <div id={`${this.props.item.id}%delete-btn`} className='btn btn-danger' onClick={this.props.deleteItem}> - </div>
+        </div>
      </section>
     );
   }

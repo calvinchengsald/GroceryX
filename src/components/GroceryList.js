@@ -59,8 +59,45 @@ class GroceryList extends Component {
     });
   }
 
+  deleteItem = (e) =>{
+    let ids = e.target.id.split('%');
+    let id = ids[0];
+    console.log(id);
+    if(!id){
+      this.setState({
+        messege: "Somethign went wrong",
+      })
+    }
+    else if (this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
+      //delete the Item
+      let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/delete/${id}`;
+      let bodyFormData = new Object();
+      bodyFormData.needJSONbreakup = "J$0nBr4k3";
+      this.fetchData(myurl,bodyFormData, (err,data)=>{
+        if(err){
+          this.setState({
+            messege: err,
+          });
+        }
+        else {
+          this.updateList();
+        }
+      })
+    }
+    else {
+      this.setState({
+        messege: "You are not authorized for this action",
+      });
+    }
+  }
   checkBox = (e) =>{
     let ids = e.target.id.split('%');
+     if (!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
+       this.setState({
+         messege: "You are not authorized for this action",
+       });
+       return;
+     }
     if(!e.target.checked){    //checked
       if(ids[1] && ids[1] == this.props.appModel.userModel.id){
         let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${ids[0]}`;
@@ -102,6 +139,12 @@ class GroceryList extends Component {
       })
     }
   }
+  setMessege(msg){
+    this.setState({
+      messege: msg
+    });
+  }
+
   updateList(){
     let myurl = `${process.env.REACT_APP_API_URL}groceryList/${this.groceryListId}`;
     let bodyFormData = new Object();
@@ -132,6 +175,50 @@ class GroceryList extends Component {
       return a.priority - b.priority;
     });
   }
+  deleteGroceryListWarning = (e) =>{
+    var confirm = window.confirm("Are you sure you want to delete this list? This cannot be undone");
+    if(confirm){
+      if(this.state.groceryListData.ownerId === this.props.appModel.userModel.id){
+        let myurl = `${process.env.REACT_APP_API_URL}groceryList/delete/${this.state.groceryListData.id}`;
+        let bodyFormData = new Object();
+        bodyFormData.needJSONbreakup = "J$0nBr4k3";
+        this.fetchData(myurl,bodyFormData, (err,data)=>{
+          if(err){
+            this.setState({
+              messege: err,
+              loading: false,
+            });
+          }
+          else {
+            this.props.history.push('/');
+          }
+        })
+      }
+      else {
+        this.setState({
+          messege: "You are not authorized for this action",
+        });
+      }
+    }
+  }
+  togglePrivate = (e) =>{
+    let myurl = `${process.env.REACT_APP_API_URL}groceryList/update/${this.state.groceryListData.id}`;
+    let bodyFormData = new Object();
+    bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    bodyFormData.private = !this.state.groceryListData.private;
+    this.fetchData(myurl,bodyFormData, (err,data)=>{
+      if(err){
+        this.setState({
+          messege: err,
+          loading: false,
+        });
+      }
+      else {
+        this.updateList();
+      }
+    })
+  }
+
 
   render() {
     if(!this.props.appModel.userModel.login){
@@ -156,9 +243,25 @@ class GroceryList extends Component {
                   </div>
                   :
                   <div className='col-12'>
-                    <h1 className='row justify-content-center'>
-                      {this.state.groceryListData.name}
-                    </h1>
+
+                    <div className='row justify-content-center'>
+                      <h1 className ='col-8 offset-2'>
+                        {this.state.groceryListData.name}
+                      </h1>
+                      <div className='col-2'>
+                        <div className='btn btn-danger' onClick={this.deleteGroceryListWarning}>
+                          Delete
+                        </div>
+                      </div>
+                    </div>
+                    <div className='row'>
+                      <div className='text-muted col-4 offset-4' >
+                        By {this.state.groceryListData.owner.name}
+                      </div>
+                      <div className={`btn btn-secondary m-0 ` + (this.props.appModel.userModel.userData.id === this.state.groceryListData.ownerId?'':'d-none')} onClick={this.togglePrivate} >
+                        {this.state.groceryListData.private?"Set Public":"Set Private"}
+                      </div>
+                    </div>
                     <div className='row'>
                       <div className='col-12 m-1 border bg-light'>
                         <div className='row border border-primary'>
@@ -168,9 +271,11 @@ class GroceryList extends Component {
                             </div>
                             <div className='col-1'> Budget
                             </div>
-                            <div className='col-2'> Priority
+                            <div className='col-1'> Priority
                             </div>
-                            <div className='col-4'> Buyer
+                            <div className='col-3'> Buyer
+                            </div>
+                            <div className='col-2'> Delete
                             </div>
                         </div>
                         {this.state.groceryListData.groceries.map((grocery,index)=>{
@@ -178,6 +283,8 @@ class GroceryList extends Component {
                             item={grocery}
                             checkBox ={this.checkBox}
                             appModel = {this.props.appModel}
+                            setMessege = {(msg)=>this.setMessege(msg)}
+                            deleteItem = {this.deleteItem}
                           />
                         })}
                       </div>

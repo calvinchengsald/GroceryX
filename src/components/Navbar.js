@@ -16,7 +16,7 @@ class Navbar extends Component {
         <div className='col-12'>
           { this.props.appModel.userModel.login?
             <div className='row justify-content-center'>
-              <Link to={`/Profile/${this.props.appModel.userModel.id}`} >{this.props.appModel.userModel.name} </Link>
+              <Link to={`/Profile/${this.props.appModel.userModel.userData.id}`} >{this.props.appModel.userModel.userData.name} </Link>
             </div>
             :
             <div className='row justify-content-center'>
@@ -24,9 +24,15 @@ class Navbar extends Component {
             </div>
           }
 
-        
+
           <div className='row justify-content-center'>
             <Link to='/Group' >Group </Link>
+          </div>
+          <div className='row justify-content-center'>
+            <Link to='/GroceryList/2' >grocerylist2 </Link>
+          </div>
+          <div className='row justify-content-center'>
+            <Link to='/Group/1' >group1 </Link>
           </div>
 
         </div>
