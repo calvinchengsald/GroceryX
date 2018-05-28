@@ -1,12 +1,15 @@
 
 import React, { Component } from 'react';
 import Messege from './Messege';
+//import bcrypt from 'bcryptjs';
 
 class SignUpIn extends Component {
   constructor(props){
     super(props);
     this.initializeRefs();
     this.base = process.env.REACT_APP_API_URL;
+    //this.bcrypt = require('bcrypt');
+    //this.salt = bcrypt.genSaltSync();
   }
 
   initializeRefs(){
@@ -24,35 +27,28 @@ class SignUpIn extends Component {
     }
   }
   handleSignIn = () => {
-
+    if(this.props.appModel.userModel.login){
+      return this.props.rerender("You are already logged in!");
+    }
     if(!this.refSignInUsername.current.value){
-      this.setState({
-        messege : "Please enter username",
-      });
+      return this.props.rerender("Please enter username");
     }
     else if(!this.refSignInPassword.current.value){
-      this.setState({
-        messege : "Please enter password",
-      });
+      return this.props.rerender("Please enter password");
     }
     else {
       let myurl = `${this.base}user/signIn`;
       let bodyFormData = new Object();
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
       bodyFormData.username = this.refSignInUsername.current.value;
+  //    bodyFormData.password = bcrypt.hashSync(this.refSignInPassword.current.value, this.salt);
       bodyFormData.password = this.refSignInPassword.current.value;
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
-          this.setState({
-            messege: err
-          });
           return this.props.rerender(err);
         }
         else {
           if(data.error){
-            // return this.setState({
-            //   messege: data.error
-            // });
             return this.props.rerender(data.error);
           }
           this.props.appModel.userModel.name = data.name;
@@ -64,12 +60,15 @@ class SignUpIn extends Component {
           //   messege: "Welcome "+data.name
           // });
           this.props.rerender("Welcome "+data.name);
+          this.props.history.push('/Group');
         }
       })
     }
   }
   handleSignUp = () => {
-
+    if(this.props.appModel.userModel.login){
+      return this.props.rerender("You must log out first!");
+    }
     if(!this.refSignUpUsername.current.value){
       // this.setState({
       //   messege : "Please enter username",
@@ -99,7 +98,8 @@ class SignUpIn extends Component {
       let bodyFormData = new Object();
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
       bodyFormData.username = this.refSignUpUsername.current.value;
-      bodyFormData.password = this.refSignUpPassword.current.value;
+      //bodyFormData.password =   bcrypt.hashSync(this.refSignUpPassword.current.value,this.salt);
+      bodyFormData.password =   this.refSignUpPassword.current.value;
       bodyFormData.name = this.refSignUpName.current.value;
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
@@ -165,11 +165,11 @@ class SignUpIn extends Component {
               </div>
               <div className='row'>
                 <div className='col-3 offset-1'>Username: </div>
-                <input defaultValue="back up" placeholder='Username' ref={this.refSignInUsername} type='text' className='col-5 offset-1'/>
+                <input defaultValue="synthesize" placeholder='Username' ref={this.refSignInUsername} type='text' className='col-5 offset-1'/>
               </div>
               <div className='row'>
                 <div className='col-3 offset-1'>Password: </div>
-                <input type='password' defaultValue="driver" placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1'/>
+                <input type='password' defaultValue="password" placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1'/>
               </div>
               <div className='row justify-content-center'>
                 <div className='btn btn-primary' onClick={this.handleSignIn}> Sign In </div>
