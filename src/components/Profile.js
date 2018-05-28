@@ -12,7 +12,6 @@ class Profile extends Component {
     this.base = process.env.REACT_APP_API_URL;
     this.state=({
       loading:true,
-      messege: "dummy",
     })
     this.initializeUser();
   }
@@ -23,11 +22,14 @@ class Profile extends Component {
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
         this.setState({
-          messege: err,
           loading: false
         });
+        return this.props.rerender(err);
       }
       else {
+        if(data.error){
+          this.props.rerender("Failed to load user data, please refresh the page");
+        }
         this.setState({
           userProfile : data,
           loading: false
@@ -91,21 +93,23 @@ class Profile extends Component {
 
   changePassword = () =>{
     if(!this.props.appModel.userModel.login){
-      return this.setState({
-        messege: "You need to sign in first"
-      });
+      // return this.setState({
+      //   messege: "You need to sign in first"
+      // });
+      return this.props.rerender("You need to sign in first");
     }
     if(this.props.appModel.userModel.userData.id != this.props.match.params.id){
-      return this.setState({
-        messege: "You are not authorized for this action"
-      });
+      // return this.setState({
+      //   messege: "You are not authorized for this action"
+      // });
+      return this.props.rerender("You are not authorized for this action");
     }
     let newPassword = $('#new-password').val();
     if(newPassword !== $('#new-password-confirm').val()){
-      this.setState({
-        messege: "Passwords do not match"
-      });
-      return;
+      // this.setState({
+      //   messege: "Passwords do not match"
+      // });
+      return this.props.rerender("Passwords do not match");
     }
     let oldPassword = $('#confirm-password').val();
     let myurl = `${process.env.REACT_APP_API_URL}user/update/${this.props.appModel.userModel.userData.id}/password`;
@@ -116,25 +120,26 @@ class Profile extends Component {
     bodyFormData.username = this.props.appModel.userModel.userData.username;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          loading: false
-        });
+        // this.setState({
+        //   messege: err,
+        //   loading: false
+        // });
+        return this.props.rerender(err);
       }
       else {
         if(data.error){
-            this.setState({
-              messege:data.error
-            });
-            return;
+            // this.setState({
+            //   messege:data.error
+            // });
+            return this.props.rerender(data.error);
         }
         else {
             this.props.appModel.userModel.updateUserData();
             this.setState({
               userProfile : this.props.appModel.userModel.userData,
               loading: false,
-              messege: "Password Changed",
             });
+            this.props.rerender("Password Changed");
             $("#change-password-form").slideUp('400', function(){
                 $("#change-password-btn").slideDown();
             });
@@ -146,9 +151,10 @@ class Profile extends Component {
 
   showChangePassword = () => {
     if(!this.props.appModel.userModel.login){
-      return this.setState({
-        messege: "You need to sign in first"
-      });
+      // return this.setState({
+      //   messege: "You need to sign in first"
+      // });
+      return this.props.rerender("You need to sign in first");
     }
     $('#change-password-form').removeClass('d-none');
 
@@ -168,11 +174,6 @@ class Profile extends Component {
   render() {
    return (
      <section className='Profile row'>
-         <div className='col-12'>
-           <Messege
-             messege ={this.state.messege }
-           />
-         </div>
         <div className='col-10 offset-1 mt-4'>
           {this.state.loading?
             <div> loading </div>

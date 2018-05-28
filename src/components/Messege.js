@@ -10,6 +10,7 @@ class Messege extends Component {
 
   handleClose = () => {
     $('#messege').slideUp();
+    this.prevMessege = "";
   }
 
   componentDidMount(){

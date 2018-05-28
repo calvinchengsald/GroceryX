@@ -7,9 +7,6 @@ class SignUpIn extends Component {
     super(props);
     this.initializeRefs();
     this.base = process.env.REACT_APP_API_URL;
-    this.state={
-      messege : "dummy"
-    }
   }
 
   initializeRefs(){
@@ -49,22 +46,24 @@ class SignUpIn extends Component {
           this.setState({
             messege: err
           });
+          return this.props.rerender(err);
         }
         else {
           if(data.error){
-            return this.setState({
-              messege: data.error
-            });
+            // return this.setState({
+            //   messege: data.error
+            // });
+            return this.props.rerender(data.error);
           }
           this.props.appModel.userModel.name = data.name;
           this.props.appModel.userModel.username = data.username;
           this.props.appModel.userModel.login = true;
           this.props.appModel.userModel.id = data.id;
           this.props.appModel.userModel.setUserData(data);
-          this.setState({
-            messege: "Welcome "+data.name
-          });
-          this.props.rerender();
+          // this.setState({
+          //   messege: "Welcome "+data.name
+          // });
+          this.props.rerender("Welcome "+data.name);
         }
       })
     }
@@ -72,24 +71,28 @@ class SignUpIn extends Component {
   handleSignUp = () => {
 
     if(!this.refSignUpUsername.current.value){
-      this.setState({
-        messege : "Please enter username",
-      });
+      // this.setState({
+      //   messege : "Please enter username",
+      // });
+      return this.props.rerender("Please enter username");
     }
     else if(!this.refSignUpName.current.value){
-      this.setState({
-        messege : "Please enter a name",
-      });
+      // this.setState({
+      //   messege : "Please enter a name",
+      // });
+      return this.props.rerender("Please enter a name");
     }
     else if(!this.refSignUpPassword.current.value){
-      this.setState({
-        messege : "Please enter password",
-      });
+      // this.setState({
+      //   messege : "Please enter password",
+      // });
+      return this.props.rerender("Please enter password");
     }
     else if(this.refSignUpConfirmPassword.current.value !== this.refSignUpPassword.current.value ){
-      this.setState({
-        messege : "Passwords do not match",
-      });
+      // this.setState({
+      //   messege : "Passwords do not match",
+      // });
+      return this.props.rerender("Passwords do not match");
     }
     else {
       let myurl = `${this.base}user/create`;
@@ -100,15 +103,17 @@ class SignUpIn extends Component {
       bodyFormData.name = this.refSignUpName.current.value;
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
-          this.setState({
-            messege: err
-          });
+          // this.setState({
+          //   messege: err
+          // });
+          return this.props.rerender(err);
         }
         else {
           if(data.error){
-            return this.setState({
-              messege: data.error
-            });
+            // return this.setState({
+            //   messege: data.error
+            // });
+            return this.props.rerender(data.error);
           }
           else {
             this.props.appModel.userModel.name = data.name;
@@ -116,10 +121,10 @@ class SignUpIn extends Component {
             this.props.appModel.userModel.login = true;
             this.props.appModel.userModel.id = data.id;
             this.props.appModel.userModel.setUserData(data);
-            this.setState({
-              messege: "Account Created!\nWelcome "+data.name
-            });
-            this.props.rerender();
+            // this.setState({
+            //   messege: "Account Created!\nWelcome "+data.name
+            // });
+            this.props.rerender("Account Created!\nWelcome "+data.name);
           }
         }
       })
@@ -152,11 +157,6 @@ class SignUpIn extends Component {
   render() {
    return (
      <section className='SignUpIn row'>
-        <div className='col-12'>
-          <Messege
-            messege ={this.state.messege }
-          />
-        </div>
         <div className='col-6'>
           <div className = 'row m-3 justify-content-center border bg-light'>
             <div className='col-12'>

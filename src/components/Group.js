@@ -12,8 +12,7 @@ class Group extends Component {
     this.base = process.env.REACT_APP_API_URL;
     this.state=({
       loading: true,
-      groupView: false,
-      messege: "dummy"
+      groupView: false
     })
     this.groupId;
     this.initialize();
@@ -36,16 +35,17 @@ class Group extends Component {
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
           this.setState({
-            messege: err,
             groupView: true,
             groupData : data,
           });
+          return this.props.rerender("Error loading group, please refresh the page");
         }
         else {
           if(data.error){
-            return this.setState({
-              messege:data.error
-            });
+            // return this.setState({
+            //   messege:data.error
+            // });
+            return this.props.rerender("Error loading group, please refresh the page");
           }
           this.setState({
             groupData : data,
@@ -125,10 +125,10 @@ class Group extends Component {
   }
   editGroupName(){
     if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
-      this.setState({
-        messege: "You are not authorized to do that"
-      });
-      return;
+      // this.setState({
+      //   messege: "You are not authorized to do that"
+      // });
+      return this.props.rerender("You are not authorized to do that");
     }
     let editGroupName = this.refEditGroupName.current.value;
 
@@ -136,10 +136,10 @@ class Group extends Component {
       return;
     }
     if(!editGroupName){
-      this.setState({
-        messege: "Please enter a valid group name",
-      })
-      return;
+      // this.setState({
+      //   messege: "Please enter a valid group name",
+      // })
+      return this.props.rerender("Please enter a valid group name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}group/update/${this.state.groupData.id}`;
     let bodyFormData = new Object();
@@ -147,18 +147,19 @@ class Group extends Component {
     bodyFormData.groupName = editGroupName;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          groupView: true,
-        });
+        // this.setState({
+        //   messege: err,
+        //   groupView: true,
+        // });
+        return this.props.rerender(err);
       }
       else {
         if(data.error){
-          this.setState({
-            messege: data.error,
-            groupView: true,
-          })
-          return;
+          // this.setState({
+          //   messege: data.error,
+          //   groupView: true,
+          // })
+          return this.props.rerender(data.error);
         }
         this.reloadGroupData();
       }
@@ -167,10 +168,10 @@ class Group extends Component {
 
   leaveGroup = () =>{
     if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
-      this.setState({
-        messege: "You are not a part of this group"
-      });
-      return;
+      // this.setState({
+      //   messege: "You are not a part of this group"
+      // });
+      return this.props.rerender("You are not a part of this group");
     }
     let myurl = `${process.env.REACT_APP_API_URL}groupUser/leave`;
     let bodyFormData = new Object();
@@ -179,12 +180,16 @@ class Group extends Component {
     bodyFormData.groupId = this.state.groupData.id;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          groupView: true,
-        });
+        // this.setState({
+        //   messege: err,
+        //   groupView: true,
+        // });
+        return this.props.rerender(err);
       }
       else {
+        if(data.error){
+          return this.props.rerender(data.error);
+        }
         this.props.history.push('/');
         this.props.appModel.userModel.updateUserData();
       }
@@ -193,30 +198,26 @@ class Group extends Component {
   }
   addMemberToGroup = (e) => {
     let addUsername = this.refAddMemberUsername.current.value;
-      console.log(addUsername);
     if(!addUsername){
-      this.setState({
-        messege: "Please enter a valid username",
-      })
-      return;
+      // this.setState({
+      //   messege: "Please enter a valid username",
+      // })
+      return this.props.rerender("Please enter a valid username");
     }
     let myurl = `${process.env.REACT_APP_API_URL}user/search/username/${addUsername}`;
     let bodyFormData = new Object();
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          groupView: true,
-        });
+        // this.setState({
+        //   messege: err,
+        //   groupView: true,
+        // });
+        return this.props.rerender(err);
       }
       else {
         if(data.error){
-          this.setState({
-            messege: data.error,
-            groupView: true,
-          });
-          return;
+          return this.props.rerender(data.error);
         }
         let myurl = `${process.env.REACT_APP_API_URL}groupUser/create`;
         let bodyFormData = new Object();
@@ -225,18 +226,22 @@ class Group extends Component {
         bodyFormData.groupId = this.state.groupData.id;
         this.fetchData(myurl,bodyFormData, (err,data2)=>{
           if(err){
-            this.setState({
-              messege: err,
-              groupView: true,
-            });
-            return;
+            // this.setState({
+            //   messege: err,
+            //   groupView: true,
+            // });
+            return this.props.rerender(err);
           }
           else {
+            if(data.error){
+              return this.props.rerender(data.error);
+            }
             this.reloadGroupData();
-            this.setState({
-              messege: "Successfully added user",
-              groupView: true,
-            });
+            // this.setState({
+            //   messege: "Successfully added user",
+            //   groupView: true,
+            // });
+            return this.props.rerender("Successfully added user");
           }
         })
       }
@@ -245,10 +250,10 @@ class Group extends Component {
   createGroup = (e) =>{
     let createGroupName = this.refCreateGroupName.current.value;
     if(!createGroupName){
-      this.setState({
-        messege: "Please enter a valid group name",
-      })
-      return;
+      // this.setState({
+      //   messege: "Please enter a valid group name",
+      // })
+      return this.props.rerender("Please enter a valid group name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}group/create`;
     let bodyFormData = new Object();
@@ -256,17 +261,19 @@ class Group extends Component {
     bodyFormData.groupName = createGroupName;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          groupView: true,
-        });
+        // this.setState({
+        //   messege: err,
+        //   groupView: true,
+        // });
+        return this.props.rerender(err);
       }
       else {
         if(data.error){
-          this.setState({
-            messege: data.err,
-            groupView: true,
-          });
+          // this.setState({
+          //   messege: data.err,
+          //   groupView: true,
+          // });
+          return this.props.rerender(data.error);
         }
         let myurl = `${process.env.REACT_APP_API_URL}groupUser/create`;
         let bodyFormData = new Object();
@@ -275,18 +282,19 @@ class Group extends Component {
         bodyFormData.groupId = data.id;
         this.fetchData(myurl,bodyFormData, (err,data)=>{
           if(err){
-            this.setState({
-              messege: err,
-              groupView: false,
-            });
+            // this.setState({
+            //   messege: err,
+            //   groupView: false,
+            // });
+            return this.props.rerender(err);
           }
           else {
             if(data.error){
-              this.setState({
-                messege: "Unable to add user to group",
-                groupView: false,
-              });
-              return;
+              // this.setState({
+              //   messege: "Unable to add user to group",
+              //   groupView: false,
+              // });
+              return this.props.rerender("Unable to add user to group");
             }
             this.props.appModel.userModel.updateUserData();
             this.reloadGroupData();
@@ -298,10 +306,10 @@ class Group extends Component {
   createGroceryList = (e) =>{
     let addGroceryListName = this.refAddGroceryListName.current.value;
     if(!addGroceryListName){
-      this.setState({
-        messege: "Please enter a valid list name",
-      })
-      return;
+      // this.setState({
+      //   messege: "Please enter a valid list name",
+      // })
+      return this.props.rerender("Please enter a valid list name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}groceryList/create`;
     let bodyFormData = new Object();
@@ -312,10 +320,10 @@ class Group extends Component {
     bodyFormData.private = false;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          groupView: true,
-        });
+        // this.setState({
+        //   groupView: true,
+        // });
+        return this.props.rerender(err);
       }
       else {
         this.reloadGroupData();
@@ -328,12 +336,15 @@ class Group extends Component {
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          groupData : data,
-        });
+        // this.setState({
+        //   groupData : data,
+        // });
+        return this.props.rerender(err);
       }
       else {
+        if(data.error){
+          return this.props.rerender("Something went wrong while loading that data");
+        }
         this.setState({
           groupData : data,
         });
@@ -349,17 +360,11 @@ class Group extends Component {
     }
      return (
        <section className='Group row'>
-         <div className='col-12'>
-           <Messege
-             messege ={this.state.messege }
-           />
-         </div>
           <div className='col-10 offset-1 mt-4'>
             {this.state.groupView?
               <div className='row'>
                 {this.state.groupData.error?
                   <div className='col-12'>
-                    {this.state.groupData.error}
                   </div>
                   :
                   <div className='col-12'>

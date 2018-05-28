@@ -63,6 +63,11 @@ class UserModel {
     });
   }
 
+  signOut(){
+    this.login= false;
+    this.userData = null;
+  }
+
 }
 
 export default UserModel;

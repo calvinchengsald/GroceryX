@@ -13,7 +13,6 @@ class GroceryList extends Component {
     this.base = process.env.REACT_APP_API_URL;
     this.state=({
       loading: true,
-      messege: "dummy"
     })
     this.groceryListId;
     this.initialize();
@@ -63,11 +62,8 @@ class GroceryList extends Component {
   deleteItem = (e) =>{
     let ids = e.target.id.split('%');
     let id = ids[0];
-    console.log(id);
     if(!id){
-      this.setState({
-        messege: "Somethign went wrong",
-      })
+      return this.props.rerender("Something went wrong");
     }
     else if (this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
       //delete the Item
@@ -76,28 +72,26 @@ class GroceryList extends Component {
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
-          this.setState({
-            messege: err,
-          });
+          return this.props.rerender(err);
         }
         else {
+          if(data.error){
+            return this.props.rerender(data.error);
+          }
           this.updateList();
         }
       })
     }
     else {
-      this.setState({
-        messege: "You are not authorized for this action",
-      });
+
+      return this.props.rerender("You are not authorized for this action");
     }
   }
   checkBox = (e) =>{
     let ids = e.target.id.split('%');
      if (!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
-       this.setState({
-         messege: "You are not authorized for this action",
-       });
-       return;
+
+       return this.props.rerender("You are not authorized for this action");
      }
     if(!e.target.checked){    //checked
       if(ids[1] && ids[1] == this.props.appModel.userModel.id){
@@ -107,19 +101,18 @@ class GroceryList extends Component {
         bodyFormData.needJSONbreakup = "J$0nBr4k3";
         this.fetchData(myurl,bodyFormData, (err,data)=>{
           if(err){
-            this.setState({
-              messege: err,
-            });
+            return this.props.rerender(err);
           }
           else {
+            if(data.error){
+              return this.props.rerender(data.error);
+            }
             this.updateList();
           }
         })
       }
       else {
-        this.setState({
-          messege : "That has already been purchased"
-        });
+        return this.props.rerender("That has already been purchased");
       }
     }
     else {
@@ -130,20 +123,19 @@ class GroceryList extends Component {
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
-          this.setState({
-            messege: err,
-          });
+          return this.props.rerender(err);
         }
         else {
+          if(data.error){
+            return this.props.rerender(data.error);
+          }
           this.updateList();
         }
       })
     }
   }
   setMessege(msg){
-    this.setState({
-      messege: msg
-    });
+    return this.props.rerender(msg);
   }
 
   updateList(){
@@ -152,13 +144,12 @@ class GroceryList extends Component {
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          groceryListData: data,
-          loading: false,
-        });
+        return this.props.rerender(err);
       }
       else {
+        if(data.error){
+          return this.props.rerender(data.error);
+        }
         this.orderGroceryListData(data);
         this.setState({
           groceryListData : data,
@@ -185,20 +176,18 @@ class GroceryList extends Component {
         bodyFormData.needJSONbreakup = "J$0nBr4k3";
         this.fetchData(myurl,bodyFormData, (err,data)=>{
           if(err){
-            this.setState({
-              messege: err,
-              loading: false,
-            });
+            return this.props.rerender(err);
           }
           else {
+            if(data.error){
+              return this.props.rerender(data.error);
+            }
             this.props.history.push('/');
           }
         })
       }
       else {
-        this.setState({
-          messege: "You are not authorized for this action",
-        });
+        return this.props.rerender("You are not authorized to do that");
       }
     }
   }
@@ -209,12 +198,12 @@ class GroceryList extends Component {
     bodyFormData.private = !this.state.groceryListData.private;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          loading: false,
-        });
+        return this.props.rerender(err);
       }
       else {
+        if(data.error){
+          return this.props.rerender(data.error);
+        }
         this.updateList();
       }
     })
@@ -230,6 +219,7 @@ class GroceryList extends Component {
     $('#budget-select').removeClass('d-none');
     $('#name-select').removeClass('d-none');
     $('#hide-add-item-btn').removeClass('d-none');
+    $('#name-select').focus();
   }
   hideAddItem() {
     $('#add-item-btn-show').removeClass('d-none');
@@ -250,10 +240,8 @@ class GroceryList extends Component {
   }
   editGroceryListName(){
     if(!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
-      this.setState({
-        messege: "You are not authorized to do that"
-      });
-      return;
+
+      return this.props.rerender("You are not authorized to do that");
     }
     let editGroceryListName = this.refEditGroceryListName.current.value;
 
@@ -261,10 +249,7 @@ class GroceryList extends Component {
       return;
     }
     if(!editGroceryListName){
-      this.setState({
-        messege: "Please enter a valid list name",
-      })
-      return;
+      return this.props.rerender("Please enter a valid list name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}groceryList/update/${this.state.groceryListData.id}`;
     let bodyFormData = new Object();
@@ -272,16 +257,11 @@ class GroceryList extends Component {
     bodyFormData.name = editGroceryListName;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-        });
+        return this.props.rerender(err);
       }
       else {
         if(data.error){
-          this.setState({
-            messege: data.error,
-          })
-          return;
+          return this.props.rerender(data.error);
         }
         this.updateList();
       }
@@ -292,9 +272,7 @@ class GroceryList extends Component {
     let itemBudget = $('#budget-select').val();
     let itemPriority = $('#priority-select').val();
     if(!itemName){
-      this.setState({
-        messege: "You must include an Item Name"
-      });
+      return this.props.rerender("You must include an Item Name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/create`;
     let bodyFormData = new Object();
@@ -309,16 +287,11 @@ class GroceryList extends Component {
     }
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          loading: false,
-        });
+        return this.props.rerender(err);
       }
       else {
         if(data.error){
-          return this.setState({
-            messege: data.error,
-          });
+          return this.props.rerender(data.error);
         }
         this.updateList();
         this.hideAddItem();
@@ -330,9 +303,7 @@ class GroceryList extends Component {
     let itemBudget = $('#budget-select-edit').val();
     let itemPriority = $('#priority-select-edit').val();
     if(!itemName){
-      this.setState({
-        messege: "You must include an Item Name"
-      });
+      this.props.rerender("You must include an Item Name");
       return callback(false);
     }
     let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${id}`;
@@ -346,17 +317,12 @@ class GroceryList extends Component {
     }
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        this.setState({
-          messege: err,
-          loading: false,
-        });
+        this.props.rerender(err);
         return callback(false);
       }
       else {
         if(data.error){
-          this.setState({
-            messege: data.error,
-          });
+          this.props.rerender(data.error);
           return callback(false);
         }
         this.updateList();
@@ -376,11 +342,6 @@ class GroceryList extends Component {
     }
      return (
        <section className='Group row'>
-         <div className='col-12'>
-           <Messege
-             messege ={this.state.messege }
-           />
-         </div>
           <div className='col-10 offset-1 mt-4'>
             {(this.state.groceryListData.private && this.state.groceryListData.ownerId !== this.props.appModel.userModel.userData.id)?
               <div className='row'>

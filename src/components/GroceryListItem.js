@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import $ from 'jquery';
 
 class GroceryListItem extends Component {
 
@@ -10,9 +11,17 @@ class GroceryListItem extends Component {
     };
   }
   setEdit = () =>{
-    this.setState({
-      editMode:true
+    this.setState(
+      {editMode:true},
+      ()=> {$('#name-select-edit').focus(); }
+    );
+
+  }
+  hideEdit = () =>{
+    this.setState(
+      {editMode:false
     });
+
   }
   editItem(){
     console.log(this.props.item.id);
@@ -73,7 +82,7 @@ class GroceryListItem extends Component {
       return (
         <section className='groceryListItem row border border-primary'>
           <div className='col-1'>
-            <div id='hide-edit-item-btn' className='btn btn-danger' onClick={()=>this.hideAddItem()}>
+            <div id='hide-edit-item-btn' className='btn btn-danger' onClick={()=>this.hideEdit()}>
               X
             </div>
           </div>

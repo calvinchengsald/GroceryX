@@ -9,6 +9,7 @@ import Group from './components/Group';
 import GroceryList from './components/GroceryList';
 import Navbar from './components/Navbar';
 import AppModel from './model/AppModel';
+import Messege from './components/Messege';
 require('dotenv').config();
 
 class App extends Component {
@@ -18,6 +19,10 @@ class App extends Component {
     this.appModel = new AppModel();
     this.customComponent = new Object();
     this.setupCustomComponent();
+    this.state={
+        messege:"welcome",
+        loading:true
+    };
 
   }
   setupCustomComponent(comp){
@@ -25,7 +30,7 @@ class App extends Component {
       return (
         <Profile
           appModel = {this.appModel}
-          rerender = {this.rerender}
+          rerender = {(msg) => this.rerender(msg)}
           {...props}
         />
       );
@@ -34,7 +39,7 @@ class App extends Component {
       return (
         <SignUpIn
           appModel = {this.appModel}
-          rerender = {this.rerender}
+          rerender = {(msg) => this.rerender(msg)}
           {...props}
         />
       );
@@ -43,7 +48,7 @@ class App extends Component {
       return (
         <Group
           appModel = {this.appModel}
-          rerender = {this.rerender}
+          rerender = {(msg) => this.rerender(msg)}
           {...props}
         />
       );
@@ -52,21 +57,37 @@ class App extends Component {
       return (
         <GroceryList
           appModel = {this.appModel}
-          rerender = {this.rerender}
+          rerender = {(msg) => this.rerender(msg)}
           {...props}
         />
       );
     };
   }
-  rerender = () =>{
-    this.setState({
+  rerender(msg){
+    if(msg){
+      this.setState({
+        messege: msg
+      });
+    }
+    else {
+      this.setState({
 
+      });
+    }
+  }
+  componentDidMount(){
+    this.setState({
+      loading:false
     });
   }
 
 
 
   render() {
+
+    if(this.state.loading){
+      return (<div>Loading</div>);
+    }
     return (
       <div className="App">
         <div className='container-fluid'>
@@ -74,9 +95,13 @@ class App extends Component {
             <div className='col-2'>
               <Navbar
                 appModel={this.appModel}
+                rerender={(msg)=>this.rerender(msg)}
               />
             </div>
             <main className='col-10'>
+                <Messege
+                  messege = {this.state.messege}
+                />
              <Route exact path="/" component={Landing} />
              <Route path="/Profile/:id" render={this.customComponent.profile} />
              <Route path="/SignUpIn" render={this.customComponent.signUpIn} />

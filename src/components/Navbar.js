@@ -10,13 +10,23 @@ class Navbar extends Component {
     super(props);
   }
 
+  signOut = () =>{
+    this.props.appModel.userModel.signOut();
+    this.props.rerender("Sucessfully Signed Out");
+  }
+
   render() {
    return (
      <div className='row bg-light' id='navbar'>
         <div className='col-12'>
           { this.props.appModel.userModel.login?
+            <div>
             <div className='row justify-content-center'>
               <Link to={`/Profile/${this.props.appModel.userModel.userData.id}`} >{this.props.appModel.userModel.userData.name} </Link>
+            </div>
+            <div className='row justify-content-center'>
+              <div className='btn' onClick={this.signOut}>Sign Out </div>
+            </div>
             </div>
             :
             <div className='row justify-content-center'>
