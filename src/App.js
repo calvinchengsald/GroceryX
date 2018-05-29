@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import './App.css';
+import './css/App.css';
 import { Route, Link } from 'react-router-dom';
 import Landing from './components/Landing';
 import SignUpIn from './components/SignUpIn';
@@ -10,6 +10,7 @@ import GroceryList from './components/GroceryList';
 import Navbar from './components/Navbar';
 import AppModel from './model/AppModel';
 import Messege from './components/Messege';
+import $ from 'jquery';
 require('dotenv').config();
 
 class App extends Component {
@@ -31,6 +32,7 @@ class App extends Component {
         <Profile
           appModel = {this.appModel}
           rerender = {(msg) => this.rerender(msg)}
+          hideSidebar = {()=>this.hideSidebar()}
           {...props}
         />
       );
@@ -40,6 +42,7 @@ class App extends Component {
         <SignUpIn
           appModel = {this.appModel}
           rerender = {(msg) => this.rerender(msg)}
+          hideSidebar = {()=>this.hideSidebar()}
           {...props}
         />
       );
@@ -49,6 +52,7 @@ class App extends Component {
         <Group
           appModel = {this.appModel}
           rerender = {(msg) => this.rerender(msg)}
+          hideSidebar = {()=>this.hideSidebar()}
           {...props}
         />
       );
@@ -58,6 +62,7 @@ class App extends Component {
         <GroceryList
           appModel = {this.appModel}
           rerender = {(msg) => this.rerender(msg)}
+          hideSidebar = {()=>this.hideSidebar()}
           {...props}
         />
       );
@@ -65,6 +70,11 @@ class App extends Component {
   }
   rerender(msg){
     if(msg){
+      if(msg==="~"){
+        return this.setState({
+
+        });
+      }
       this.setState({
         messege: msg
       });
@@ -75,10 +85,27 @@ class App extends Component {
       });
     }
   }
+
   componentDidMount(){
     this.setState({
       loading:false
     });
+  }
+  toggleSidebar = () =>{
+    let element = $('#sidebar');
+    if(element.position().left >= 0){
+      element.animate({"left": '-=40vw'})
+    }
+    else {
+      element.animate({"left": '+=40vw'})
+    }
+  }
+  hideSidebar(){
+
+    let element = $('#sidebar');
+    if(element.position().left >= 0){
+      element.animate({"left": '-=40vw'})
+    }
   }
 
 
@@ -92,13 +119,21 @@ class App extends Component {
       <div className="App">
         <div className='container-fluid'>
           <div className='row'>
-            <div className='col-2'>
+            <div className='d-none d-md-block col-2'>
+              <Navbar
+                appModel={this.appModel}
+                rerender={(msg)=>this.rerender(msg)}
+                hideSidebar={()=>this.hideSidebar()}
+              />
+            </div>
+            <div id='sidebar-toggle' className='d-block d-md-none glyphicon glyphicon-list btn' onClick={this.toggleSidebar} > </div>
+            <div id="sidebar" className='d-block d-md-none'>
               <Navbar
                 appModel={this.appModel}
                 rerender={(msg)=>this.rerender(msg)}
               />
             </div>
-            <main className='col-10'>
+            <main className='col'>
                 <Messege
                   messege = {this.state.messege}
                   rerender={(msg)=>this.rerender(msg)}

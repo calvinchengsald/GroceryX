@@ -28,7 +28,7 @@ class UserModel {
     return ultBool;
   }
 
-  updateUserData(){
+  updateUserData(callback){
     let myurl = `${process.env.REACT_APP_API_URL}user/${this.userData.id}`;
     let bodyFormData = new Object();
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
@@ -38,6 +38,7 @@ class UserModel {
       }
       else {
         this.userData = Object.assign({},data);
+        return callback();
       }
     })
   }

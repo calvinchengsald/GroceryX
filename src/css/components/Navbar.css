@@ -2,4 +2,5 @@
 #navbar{
   height : 100vh;
   overflow : scroll;
+  background-color: rgba(135,206,235,0.8);
 }

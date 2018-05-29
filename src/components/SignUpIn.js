@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import Messege from './Messege';
 //import bcrypt from 'bcryptjs';
+import '../css/App.css';
 
 class SignUpIn extends Component {
   constructor(props){
@@ -25,7 +26,6 @@ class SignUpIn extends Component {
     if(this.props.appModel.userModel.login){
       this.props.history.push('/');
     }
-
     return this.props.rerender("");
   }
   handleSignIn = () => {
@@ -58,9 +58,6 @@ class SignUpIn extends Component {
           this.props.appModel.userModel.login = true;
           this.props.appModel.userModel.id = data.id;
           this.props.appModel.userModel.setUserData(data);
-          // this.setState({
-          //   messege: "Welcome "+data.name
-          // });
           this.props.rerender("Welcome "+data.name);
           this.props.history.push('/Group');
         }
@@ -158,52 +155,52 @@ class SignUpIn extends Component {
 
   render() {
    return (
-     <section className='SignUpIn row'>
+     <section className='SignUpIn row mt-4'>
         <div className='col-6'>
-          <div className = 'row m-3 justify-content-center border bg-light'>
+          <div className = 'row m-1 justify-content-center border bg-light border-secondary'>
             <div className='col-12'>
               <div className='row'>
-                <div className='col-12'>Sign In</div>
+                <div className='col-12 font-4'>Sign In</div>
               </div>
               <div className='row'>
-                <div className='col-3 offset-1'>Username: </div>
-                <input type='text' defaultValue="hack" placeholder='Username' ref={this.refSignInUsername}  className='col-5 offset-1'/>
+                <div className='col-3 offset-1 font-2'>Username: </div>
+                <input type='text' defaultValue="hack" placeholder='Username' ref={this.refSignInUsername}  className='col-5 offset-1 font-2'/>
               </div>
               <div className='row'>
-                <div className='col-3 offset-1'>Password: </div>
-                <input type='password' defaultValue="password1" placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1'/>
+                <div className='col-3 offset-1 font-2'>Password: </div>
+                <input type='password' defaultValue="card" placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1 font-2'/>
               </div>
               <div className='row justify-content-center'>
-                <div className='btn btn-primary' onClick={this.handleSignIn}> Sign In </div>
+                <div className='btn btn-primary  font-3' onClick={this.handleSignIn}> Sign In </div>
               </div>
             </div>
           </div>
         </div>
 
         <div className='col-6'>
-        <div className = 'row m-3 justify-content-center border bg-light'>
+        <div className = 'row m-1 justify-content-center border bg-light border-secondary'>
           <div className='col-12'>
             <div className='row'>
-              <div className='col-12'>Sign Up</div>
+              <div className='col-12 font-4'>Sign Up</div>
             </div>
             <div className='row'>
-              <div className='col-3 offset-1'>Username: </div>
-              <input placeholder='Username' ref={this.refSignUpUsername} type='text' className='col-5 offset-1'/>
+              <div className='col-3 offset-1  font-2'>Username: </div>
+              <input placeholder='Username' ref={this.refSignUpUsername} type='text' className='col-5 offset-1 font-2'/>
             </div>
             <div className='row'>
-              <div className='col-3 offset-1'>Name: </div>
-              <input placeholder='Name' ref={this.refSignUpName} type='text' className='col-5 offset-1'/>
+              <div className='col-3 offset-1 font-2'>Name: </div>
+              <input placeholder='Name' ref={this.refSignUpName} type='text' className='col-5 offset-1 font-2'/>
             </div>
             <div className='row'>
-              <div className='col-3 offset-1'>Password: </div>
-              <input placeholder='Password' ref={this.refSignUpPassword} type='password' className='col-5 offset-1'/>
+              <div className='col-3 offset-1 font-2'>Password: </div>
+              <input placeholder='Password' ref={this.refSignUpPassword} type='password' className='col-5 offset-1 font-2'/>
             </div>
             <div className='row'>
-              <div className='col-3 offset-1'>Confirm Password: </div>
-              <input placeholder='Password' ref={this.refSignUpConfirmPassword} type='password' className='col-5 offset-1'/>
+              <div className='col-3 offset-1 font-2'>Confirm Password: </div>
+              <input placeholder='Password' ref={this.refSignUpConfirmPassword} type='password' className='col-5 offset-1 font-2'/>
             </div>
             <div className='row justify-content-center'>
-              <div className='btn btn-primary' onClick={this.handleSignUp}> Sign Up </div>
+              <div className='btn btn-primary font-3' onClick={this.handleSignUp}> Sign Up </div>
             </div>
           </div>
         </div>

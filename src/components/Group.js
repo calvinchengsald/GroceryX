@@ -12,7 +12,7 @@ class Group extends Component {
     this.base = process.env.REACT_APP_API_URL;
     this.state=({
       loading: true,
-      groupView: false
+      groupView: false,
     })
     this.groupId;
     this.initialize();
@@ -22,6 +22,9 @@ class Group extends Component {
     this.refAddGroceryListName = React.createRef();
     this.refCreateGroupName = React.createRef();
     this.refEditGroupName = React.createRef();
+  }
+  componentDidUpdate(){
+
   }
 
 
@@ -55,14 +58,21 @@ class Group extends Component {
         }
       })
     }
+    this.listenId = setInterval(()=>{this.handleSafeReload()},1000);
   }
-  componentDidUpdate(){
-    // if(this.props.match.params.groupId && this.props.match.params.groupId !== this.groupId){
-    //   this.groupId = this.props.match.params.groupId;
-    //   this.setState({
-    //     groupView: true,
-    //   })
-    // }
+
+  componentWillUnmount(){
+    clearInterval(this.listenId);
+  }
+  handleSafeReload(){
+    if(this.props.match.params.groupId){
+      this.reloadGroupData();
+    }
+    else {
+      this.props.appModel.userModel.updateUserData(()=>{
+        this.props.rerender("~");
+      })
+    }
   }
 
   fetchData(myurl,bodyFormData, callback){
@@ -94,6 +104,7 @@ class Group extends Component {
     }
     $('#toggle-invite-member').addClass('d-none');
     $('#invite-member').removeClass('d-none');
+    $('#invite-member-username').focus();
   }
   hideInviteMember= () =>{
     $('#invite-member').addClass('d-none');
@@ -105,6 +116,7 @@ class Group extends Component {
     }
     $('#toggle-create-grocery-list').addClass('d-none');
     $('#create-grocery-list').removeClass('d-none');
+    $('#create-grocery-list-name').focus();
   }
   hideCreateGroceryList= () =>{
     $('#toggle-create-grocery-list').removeClass('d-none');
@@ -113,8 +125,9 @@ class Group extends Component {
   showCreateGroup =() =>{
     $('#toggle-create-group').addClass('d-none');
     $('#create-group').removeClass('d-none');
+    $('#create-group-name').focus();
   }
-  hideCreateGroup = () =>{
+  hideCreateGroup(){
     $('#toggle-create-group').removeClass('d-none');
     $('#create-group').addClass('d-none');
   }
@@ -193,8 +206,10 @@ class Group extends Component {
         if(data.error){
           return this.props.rerender(data.error);
         }
-        this.props.history.push('/');
-        this.props.appModel.userModel.updateUserData();
+        this.props.history.push("/Group");
+        return this.props.appModel.userModel.updateUserData(()=>{
+          this.props.rerender("Successfully left group");
+        });
       }
     })
 
@@ -239,8 +254,8 @@ class Group extends Component {
             return this.props.rerender(err);
           }
           else {
-            if(data.error){
-              return this.props.rerender(data.error);
+            if(data2.error){
+              return this.props.rerender(data2.error);
             }
             this.reloadGroupData();
             // this.setState({
@@ -302,8 +317,12 @@ class Group extends Component {
               // });
               return this.props.rerender("Unable to add user to group");
             }
-            this.props.appModel.userModel.updateUserData();
-            this.reloadGroupData();
+
+            this.hideCreateGroup();
+            return this.props.appModel.userModel.updateUserData(()=>{
+              this.props.rerender("Successfully created Group");
+            });
+
           }
         })
       }
@@ -360,10 +379,15 @@ class Group extends Component {
 
 
   render() {
+    if(this.groupId !== this.props.match.params.groupId){
+      this.groupId = this.props.match.params.groupId;
+      this.reloadGroupData();
+    }
     if(!this.props.appModel.userModel.login){
       this.props.history.push('/SignUpIn');
       return(<div></div>);
     }
+
      return (
        <section className='Group row'>
           <div className='col-10 offset-1 mt-4'>
@@ -375,33 +399,39 @@ class Group extends Component {
                   :
                   <div className='col-12'>
                     <div className='row justify-content-center'>
-                      <h1 id='group-name' className='col-8 offset-2' onClick={this.showEditGroupName}>
-                        {this.state.groupData.groupName}
-                      </h1>
-                      <input id='edit-group-name' ref={this.refEditGroupName} onBlur={this.hideEditGroupName} defaultValue={this.state.groupData.groupName} className={`col-8 offset-2 d-none`}/>
-                      <div className={`btn btn-danger col-2 ` + (this.props.appModel.userModel.isPartOfGroup(this.state.groupData)?'':'d-none')} onClick={this.leaveGroup}>
-                        Leave Group
+                      <div className='col-12 justify-content-center' >
+                        <h1 id='group-name' className='font-4 justify-content-center' onClick={this.showEditGroupName}>
+                          {this.state.groupData.groupName}
+                        </h1>
+                      </div>
+                      <input id='edit-group-name' ref={this.refEditGroupName} onBlur={this.hideEditGroupName} defaultValue={this.state.groupData.groupName} className={`col-12 d-none font-4 justify-content-center`}/>
+                    </div>
+                    <div className= 'row'>
+                      <div className={`col-12 justify-content-center ` + (this.props.appModel.userModel.isPartOfGroup(this.state.groupData)?'':'d-none')}>
+                        <div className='btn btn-danger font-3' onClick={this.leaveGroup} >
+                          Leave Group
+                        </div>
                       </div>
                     </div>
                     <div className='row'>
                       <div className='col-8 m-1 border bg-light' onMouseLeave={this.hideCreateGroceryList}>
                         <div className='row'>
-                          <div className='col-12 text-primary justify-content-center'>
+                          <div className='col-12 text-primary justify-content-center font-3'>
                             Grocery Lists
                           </div>
                         </div>
                         {this.state.groupData.grocerylists.map((grocerylist)=>{
                           return <div className='row'>
-                            <Link className='col-12' to={`/grocerylist/${grocerylist.id}`}>
+                            <Link className='col-12 font-3' to={`/grocerylist/${grocerylist.id}`}>
                               {grocerylist.name}
                             </Link>
                           </div>
                         })}
-                        <div id='toggle-create-grocery-list' className='row btn btn-primary' onClick={this.showCreateGroceryList}>
+                        <div id='toggle-create-grocery-list' className='row btn btn-primary font-2' onClick={this.showCreateGroceryList}>
                           Create List
                         </div>
                         <div id='create-grocery-list' className='row d-none'>
-                          <input placeholder='List name' type='text' ref={this.refAddGroceryListName} className='col-10'/>
+                          <input id='create-grocery-list-name' placeholder='List name' type='text' ref={this.refAddGroceryListName} className='col-10 font-3'/>
                           <div  className='col-2 btn btn-primary' onClick={this.createGroceryList}>
                             +
                           </div>
@@ -409,22 +439,22 @@ class Group extends Component {
                       </div>
                       <div className='col-3 m-1 border bg-light' onMouseLeave={this.hideInviteMember}>
                         <div className='row'>
-                          <div className='col-12 text-primary justify-content-center'>
+                          <div className='col-12 text-primary justify-content-center font-3'>
                             Members
                           </div>
                         </div>
                         {this.state.groupData.groupusers.map((groupuser)=>{
                           return <div className='row'>
-                            <Link className='col-12' to={`/profile/${groupuser.user.id}`}>
+                            <Link className='col-12 font-3' to={`/profile/${groupuser.user.id}`}>
                               {groupuser.user.name}
                             </Link>
                           </div>
                         })}
-                        <div id='toggle-invite-member' className='row btn btn-primary' onClick={this.showInviteMember}>
+                        <div id='toggle-invite-member' className='row btn btn-primary font-2' onClick={this.showInviteMember}>
                           Invite Member
                         </div>
                         <div id='invite-member' className='row d-none' >
-                          <input placeholder='username' type='text' ref={this.refAddMemberUsername} className='col-10'/>
+                          <input id='invite-member-username' placeholder='username' type='text' ref={this.refAddMemberUsername} className='col-10 font-3'/>
                           <div  className='col-2 btn btn-primary' onClick={this.addMemberToGroup}>
                             +
                           </div>
@@ -442,29 +472,29 @@ class Group extends Component {
                   :
                   <div className='col-12'>
                     <div className='row'>
-                      <div className='col-8 offset-2 justify-content-center'> Groups </div>
-                      <div className='col-2 justify-content-center'>
-                        <div id='toggle-create-group' className='row btn btn-primary' onClick={this.showCreateGroup}>
-                          Create Group
+                      <div className='col-8 offset-2 justify-content-center font-4'> Your Groups </div>
+                    </div>
+                    <div id='toggle-create-group' className='row btn btn-primary font-3' onClick={this.showCreateGroup}>
+                      Create Group
+                    </div>
+                    <div id='create-group' className='row d-none' >
+                      <div className='offset-md-2 col-2 '>
+                        <div  className='btn btn-danger'  onClick={this.hideCreateGroup}>
+                          X
                         </div>
-                        <div id='create-group' className='row d-none' >
-                          <input placeholder='username' type='text' ref={this.refCreateGroupName} className='col-10'/>
-                          <div  className='col-2 btn btn-primary'  onClick={this.createGroup}>
-                            +
-                          </div>
+                      </div>
+                      <input id='create-group-name' placeholder='Group Name' type='text' ref={this.refCreateGroupName} className=' col-8 col-md-4 font-3'/>
+                      <div className='col-2'>
+                        <div  className='btn btn-primary'  onClick={this.createGroup}>
+                          +
                         </div>
-
                       </div>
                     </div>
-                    <div className='row'>
+                    <div className='row mt-3'>
                       {this.props.appModel.userModel.userData.groupusers.map((groupuser,index)=>{
-                        return <div key={`groupuser-ender-${index}`} className='col-6 justify-content-center'>
-                          <div className='row m-2 bg-light border'>
-                            <Link className='col-12' to={`/group/${groupuser.group.id}`}>
-                              {groupuser.group.groupName}
-                            </Link>
-                          </div>
-                        </div>
+                        return <Link key={`groupuser-ender-${index}`} className='col-6 justify-content-center bg-light font-3 btn border' to={`/group/${groupuser.group.id}`}>
+                          {groupuser.group.groupName}
+                        </Link>
                       })}
                     </div>
                   </div>

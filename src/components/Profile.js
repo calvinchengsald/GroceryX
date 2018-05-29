@@ -37,36 +37,42 @@ class Profile extends Component {
       }
     })
   }
+  reloadUser(){
+    let myurl = `${process.env.REACT_APP_API_URL}user/${this.props.match.params.id}`;
+    let bodyFormData = new Object();
+    bodyFormData.needJSONbreakup = "J$0nBr4k3";
+    this.fetchData(myurl,bodyFormData, (err,data)=>{
+      if(err){
+        this.setState({
+          loading: false
+        });
+        return this.props.rerender(err);
+      }
+      else {
+        if(data.error){
+          this.props.rerender("Failed to load user data, please refresh the page");
+        }
+        this.setState({
+          userProfile : data,
+          loading: false
+        });
+      }
+    })
+  }
 
   componentDidMount() {
-    // if(!this.props.appModel.userModel.login){
-    //   this.props.history.push('/SignUpIn');
-    // }
-    // console.log(this.props.appModel.userModel.login && this.props.appModel.userModel.userData.id==this.props.match.params.id));
-    // console.log(this.props.appModel.userModel.login );
-    // console.log(this.props.appModel.userModel.login );
+    this.props.rerender("");
+    this.listenId = setInterval(()=>{this.reloadUser()},1000);
+    this.setState({
+      listenId: this.listenId
+    });
 
-    return this.props.rerender("");
 
   }
+  componentWillUnmount(){
+    clearInterval(this.state.listenId);
+  }
   componentDidUpdate(){
-    // let myurl = `${process.env.REACT_APP_API_URL}user/${this.props.match.params.id}`;
-    // let bodyFormData = new Object();
-    // bodyFormData.needJSONbreakup = "J$0nBr4k3";
-    // this.fetchData(myurl,bodyFormData, (err,data)=>{
-    //   if(err){
-    //     this.setState({
-    //       messege: err,
-    //       loading: false
-    //     });
-    //   }
-    //   else {
-    //     this.setState({
-    //       userProfile : data,
-    //       loading: false
-    //     });
-    //   }
-    // })
   }
 
   fetchData(myurl,bodyFormData, callback){
@@ -185,38 +191,38 @@ class Profile extends Component {
               :
               <div className='col-12'>
                 <div className='row'>
-                  <div className='col-12 text-left'>Name: {this.state.userProfile.name} </div>
+                  <div className='col-12 text-left font-3'>Name: {this.state.userProfile.name} </div>
                 </div>
                 <div className='row'>
-                  <div className='col-12  text-left'>Username: {this.state.userProfile.username} </div>
+                  <div className='col-12  text-left font-3'>Username: {this.state.userProfile.username} </div>
                 </div>
                 <div className='row'>
-                  <div id='change-password-btn' onClick={this.showChangePassword} className={`col-12  btn btn-secondary text-left `+((this.props.appModel.userModel.login && this.props.appModel.userModel.userData.id==this.props.match.params.id)? '' : ' d-none')} onClick={this.showChangePassword} >Change Password </div>
-                  <div id='change-password-form' onMouseLeave={this.hideChangePassword} className='col-12 d-none' >
+                  <div id='change-password-btn font-3' onClick={this.showChangePassword} className={`col-12  btn btn-secondary text-left `+((this.props.appModel.userModel.login && this.props.appModel.userModel.userData.id==this.props.match.params.id)? '' : ' d-none')} onClick={this.showChangePassword} >Change Password </div>
+                  <div id='change-password-form font-3' onMouseLeave={this.hideChangePassword} className='col-12 d-none' >
                     <div className='row'>
-                      <input type='password' id='confirm-password' className='col-6' placeholder="Password"/>
+                      <input type='password' id='confirm-password' className='col-6 font-2' placeholder="Password"/>
                     </div>
                     <div className='row'>
-                      <input type='password' id='new-password' className='col-6' placeholder="New Password"/>
+                      <input type='password' id='new-password' className='col-6 font-2' placeholder="New Password"/>
                     </div>
                     <div className='row'>
-                      <input type='password' id='new-password-confirm' className='col-6' placeholder="Confirm New Password"/>
+                      <input type='password' id='new-password-confirm' className='col-6 font-2' placeholder="Confirm New Password"/>
                     </div>
                     <div className='row'>
-                      <div className='col-6 btn btn-primary' onClick={this.changePassword}> Submit </div>
+                      <div className='col-6 btn btn-primary font-2' onClick={this.changePassword}> Submit </div>
                     </div>
                   </div>
                 </div>
                 <div className='row'>
                   <div className='col-6'>
                     <div className='row p4 border bg-light'>
-                      <div className='col-12'>
-                        <div className='row justify-content-center text-primary'>
+                      <div className='col-12 border border-secondary'>
+                        <div className='row justify-content-center text-primary font-3'>
                           Groups
                         </div>
                         {this.state.userProfile.groupusers.map((groupuser,index)=>{
                           return <div key={`groupuser-${index}`} className='row'>
-                            <Link className='col-12' to={`/group/${groupuser.group.id}`}>
+                            <Link className='col-12 font-2 border' to={`/group/${groupuser.group.id}`}>
                               {groupuser.group.groupName}
                             </Link>
                           </div>
@@ -225,14 +231,14 @@ class Profile extends Component {
                     </div>
                   </div>
                   <div className='col-6'>
-                    <div className='row p4 border bg-light'>
+                    <div className='row p4 border bg-light border border-secondary'>
                       <div className='col-12'>
-                        <div className='row justify-content-center text-primary'>
+                        <div className='row justify-content-center text-primary font-3'>
                           Grocery Lists
                         </div>
                         {this.state.userProfile.grocerylists.map((grocerylist,index)=>{
                           return <div key={`groupuser-${index}`} className='row'>
-                            <Link className='col-12' to={`/grocerylist/${grocerylist.id}`}>
+                            <Link className='col-12 font-2 border' to={`/grocerylist/${grocerylist.id}`}>
                               {grocerylist.name}
                             </Link>
                           </div>

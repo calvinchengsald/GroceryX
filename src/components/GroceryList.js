@@ -28,7 +28,11 @@ class GroceryList extends Component {
       this.groceryListId = this.props.match.params.groceryListId;
       this.updateList();
     }
+    this.listenId = setInterval(()=>{this.updateList()},1000);
     return this.props.rerender("");
+  }
+  componentWillUnmount(){
+    clearInterval(this.listenId);
   }
   componentDidUpdate(){
     // if(this.props.match.params.groceryListId && this.props.match.params.groceryListId !== this.groceryListId){
@@ -96,7 +100,7 @@ class GroceryList extends Component {
   checkBox(id){
 
     if (!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
-      return this.props.rerender("You are not authorized for this action");
+      return this.props.rerender("You do not belong to this group");
     }
     let thisData = this.findGroceryItemData(id);
     if(thisData.purchased){    //checked
@@ -143,7 +147,6 @@ class GroceryList extends Component {
   setMessege(msg){
     return this.props.rerender(msg);
   }
-
   updateList(){
     let myurl = `${process.env.REACT_APP_API_URL}groceryList/${this.groceryListId}`;
     let bodyFormData = new Object();
@@ -188,7 +191,11 @@ class GroceryList extends Component {
             if(data.error){
               return this.props.rerender(data.error);
             }
-            this.props.history.push('/');
+
+            this.props.history.push('/Group');
+            return this.props.appModel.userModel.updateUserData(()=>{
+              this.props.rerender("Successfully deleted List");
+            });
           }
         })
       }
@@ -216,9 +223,10 @@ class GroceryList extends Component {
   }
 
 
-
-
   showAddItem = (e) =>{
+    if (!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
+      return this.props.rerender("You do not belong to this group");
+    }
     $('#add-item-btn-show').addClass('d-none');
     $('#add-item-btn-action').removeClass('d-none');
     $('#priority-select').removeClass('d-none');
@@ -236,6 +244,9 @@ class GroceryList extends Component {
     $('#hide-add-item-btn').addClass('d-none');
   }
   showEditGroceryListName = (e) =>{
+    if (!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
+      return this.props.rerender("You do not belong to this group");
+    }
     $('#grocery-list-name').addClass('d-none');
     $('#edit-grocery-list-name').removeClass('d-none').focus();
   }
@@ -317,7 +328,7 @@ class GroceryList extends Component {
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.name = itemName;
     bodyFormData.priority = itemPriority;
-    bodyFormData.purchased = $('#item-bought').val();
+    bodyFormData.purchased =!this.findGroceryItemData(id).purchased;
     if(itemBudget){
       bodyFormData.budget = itemBudget;
     }
@@ -343,6 +354,10 @@ class GroceryList extends Component {
       this.props.history.push('/SignUpIn');
       return(<div></div>);
     }
+    if(this.groceryListId !== this.props.match.params.groceryListId){
+      this.groceryListId = this.props.match.params.groceryListId;
+      this.updateList();
+    }
     if(this.state.loading){
       return(<div></div>);
     }
@@ -350,7 +365,7 @@ class GroceryList extends Component {
        <section className='Group row'>
           <div className='col-10 offset-1 mt-4'>
             {(this.state.groceryListData.private && this.state.groceryListData.ownerId !== this.props.appModel.userModel.userData.id)?
-              <div className='row'>
+              <div className='row font-4'>
                 Sorry, This is a private list :(
               </div>
               :
@@ -363,21 +378,20 @@ class GroceryList extends Component {
                   <div className='col-12'>
 
                     <div className='row justify-content-center'>
-                      <h1 id='grocery-list-name' className='col-8 offset-2' onClick={this.showEditGroceryListName}>
+                      <h1 id='grocery-list-name' className='col-12 font-4' onClick={this.showEditGroceryListName}>
                         {this.state.groceryListData.name}
                       </h1>
-                      <input id='edit-grocery-list-name' ref={this.refEditGroceryListName} onBlur={this.hideEditGroceryListName} defaultValue={this.state.groceryListData.name} className={`col-8 offset-2 d-none`}/>
-                      <div className='col-2'>
-                        <div className='btn btn-danger' onClick={this.deleteGroceryListWarning}>
+                      <input id='edit-grocery-list-name' ref={this.refEditGroceryListName} onBlur={this.hideEditGroceryListName} defaultValue={this.state.groceryListData.name} className={`col-12 d-none font-4`}/>
+
+                    </div>
+                    <div className='row justify-content-center'>
+                        <div className={`btn btn-danger m-0 font-3` + (this.props.appModel.userModel.userData.id === this.state.groceryListData.ownerId?'':'d-none')} onClick={this.deleteGroceryListWarning}>
                           Delete
                         </div>
-                      </div>
-                    </div>
-                    <div className='row'>
-                      <div className='text-muted col-4 offset-4' >
+                      <div className=' col-4 font-3' >
                         By {this.state.groceryListData.owner.name}
                       </div>
-                      <div className={`btn btn-secondary m-0 ` + (this.props.appModel.userModel.userData.id === this.state.groceryListData.ownerId?'':'d-none')} onClick={this.togglePrivate} >
+                      <div className={`btn btn-secondary m-0 font-3` + (this.props.appModel.userModel.userData.id === this.state.groceryListData.ownerId?'':'d-none')} onClick={this.togglePrivate} >
                         {this.state.groceryListData.private?"Set Public":"Set Private"}
                       </div>
                     </div>
@@ -386,15 +400,15 @@ class GroceryList extends Component {
                         <div className='row border border-primary'>
                             <div className='col-1'>
                             </div>
-                            <div className='col-4'> Item
+                            <div className='col-3 font-sm-2'> Item
                             </div>
-                            <div className='col-1'> Budget
+                            <div className='col-3 font-sm-2'> Buyer
                             </div>
-                            <div className='col-1'> Priority
+                            <div className='col-1 font-sm-2'> Budget
                             </div>
-                            <div className='col-3'> Buyer
+                            <div className='col-1 font-sm-2'> Priority
                             </div>
-                            <div className='col-2'> Delete
+                            <div className='col-1 font-sm-2'> Delete
                             </div>
                         </div>
                         {this.state.groceryListData.groceries.map((grocery,index)=>{
@@ -405,22 +419,27 @@ class GroceryList extends Component {
                             setMessege = {(msg)=>this.setMessege(msg)}
                             deleteItem = {this.deleteItem}
                             editItem = {(index, callback)=>this.editItem(index, callback)}
+                            groceryListData = {this.state.groceryListData}
+                            rerender = {(str)=>this.props.rerender(str)}
                           />
                         })}
-                        <div className='row justify-content-end'>
+                        <div className='row'>
                           <div className='col-1'>
-                            <div id='hide-add-item-btn' className='btn btn-danger d-none' onClick={()=>this.hideAddItem()}>
+                            <div id='hide-add-item-btn' className='btn btn-danger d-none font-sm-2' onClick={()=>this.hideAddItem()}>
                               X
                             </div>
                           </div>
-                          <div className='col-4'>
-                            <input type='text'  id='name-select' placeholder='Item Name' className='d-none' />
+                          <div className='col-3'>
+                            <input type='text'  id='name-select' placeholder='Item Name' className='d-none font-sm-2' />
+                          </div>
+                          <div className='col-3'>
+
                           </div>
                           <div className='col-1'>
-                            <input type='number' min='1' max='10000' id='budget-select' placeholder='NA' className='d-none' />
+                            <input type='number' min='1' max='10000' id='budget-select' placeholder='NA' className='d-none font-sm-2' />
                           </div>
                           <div className='col-1'>
-                            <select id='priority-select' className='d-none' defaultValue="0">
+                            <select id='priority-select' className='d-none font-sm-2' defaultValue="0">
                               <option value="0" >None</option>
                               <option value="1" >1</option>
                               <option value="2" >2</option>
@@ -434,13 +453,13 @@ class GroceryList extends Component {
                               <option value="10" >10</option>
                             </select>
                           </div>
-                          <div id='add-item-btn-show' className='col-2 offset-3' onClick={this.showAddItem}>
-                            <div className='btn btn-primary'>
+                          <div id='add-item-btn-show' className='col-2' onClick={this.showAddItem}>
+                            <div className='btn btn-primary font-sm-2'>
                               +
                             </div>
                           </div>
-                          <div id="add-item-btn-action" className='col-2 offset-3 d-none' onClick={this.addItem}>
-                            <div className='btn btn-primary'>
+                          <div id="add-item-btn-action" className='col-2 d-none' onClick={this.addItem}>
+                            <div className='btn btn-primary font-sm-2'>
                               Add Item
                             </div>
                           </div>
