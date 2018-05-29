@@ -46,6 +46,7 @@ class Profile extends Component {
     // console.log(this.props.appModel.userModel.login );
     // console.log(this.props.appModel.userModel.login );
 
+    return this.props.rerender("");
 
   }
   componentDidUpdate(){

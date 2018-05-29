@@ -24,7 +24,6 @@ class GroceryListItem extends Component {
 
   }
   editItem(){
-    console.log(this.props.item.id);
     this.props.editItem(this.props.item.id,(success)=>{
       if(success){
         this.setState({
@@ -38,8 +37,8 @@ class GroceryListItem extends Component {
   render() {
     if(!this.state.editMode){
       return (
-        <section className='groceryListItem row border border-primary'>
-           <input className='col-1' id={`${this.props.item.id}%${this.props.item.userId}`} type='checkbox' onClick={this.props.checkBox} checked={this.props.item.purchased}/>
+        <section className='groceryListItem row border border-primary' id={`${this.props.item.id}%${this.props.item.userId}`} onClick={()=>this.props.checkBox(this.props.item.id)}>
+           <input id='item-bought' className='col-1'  type='checkbox' checked={this.props.item.purchased}/>
            <div className='col-4'>
              {this.props.item.name}
            </div>

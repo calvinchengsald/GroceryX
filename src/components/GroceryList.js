@@ -28,6 +28,7 @@ class GroceryList extends Component {
       this.groceryListId = this.props.match.params.groceryListId;
       this.updateList();
     }
+    return this.props.rerender("");
   }
   componentDidUpdate(){
     // if(this.props.match.params.groceryListId && this.props.match.params.groceryListId !== this.groceryListId){
@@ -87,15 +88,20 @@ class GroceryList extends Component {
       return this.props.rerender("You are not authorized for this action");
     }
   }
-  checkBox = (e) =>{
-    let ids = e.target.id.split('%');
-     if (!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
+  findGroceryItemData(id){
+    return this.state.groceryListData.groceries.find((grocery)=>{
+      return grocery.id===id;
+    })
+  }
+  checkBox(id){
 
-       return this.props.rerender("You are not authorized for this action");
-     }
-    if(!e.target.checked){    //checked
-      if(ids[1] && ids[1] == this.props.appModel.userModel.id){
-        let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${ids[0]}`;
+    if (!this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
+      return this.props.rerender("You are not authorized for this action");
+    }
+    let thisData = this.findGroceryItemData(id);
+    if(thisData.purchased){    //checked
+      if(thisData.userId && thisData.userId == this.props.appModel.userModel.id){
+        let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${id}`;
         let bodyFormData = new Object();
         bodyFormData.purchased=false;
         bodyFormData.needJSONbreakup = "J$0nBr4k3";
@@ -116,7 +122,7 @@ class GroceryList extends Component {
       }
     }
     else {
-      let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${ids[0]}`;
+      let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${id}`;
       let bodyFormData = new Object();
       bodyFormData.purchased=true;
       bodyFormData.userId = this.props.appModel.userModel.id;
@@ -311,7 +317,7 @@ class GroceryList extends Component {
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.name = itemName;
     bodyFormData.priority = itemPriority;
-    bodyFormData.purchased = false;
+    bodyFormData.purchased = $('#item-bought').val();
     if(itemBudget){
       bodyFormData.budget = itemBudget;
     }
@@ -394,7 +400,7 @@ class GroceryList extends Component {
                         {this.state.groceryListData.groceries.map((grocery,index)=>{
                           return <GroceryListItem key={`grocerylistitem-${index}`}
                             item={grocery}
-                            checkBox ={this.checkBox}
+                            checkBox ={(id)=>this.checkBox(id)}
                             appModel = {this.props.appModel}
                             setMessege = {(msg)=>this.setMessege(msg)}
                             deleteItem = {this.deleteItem}

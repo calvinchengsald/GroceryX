@@ -51,6 +51,7 @@ class Group extends Component {
             groupData : data,
             groupView: true,
           });
+          return this.props.rerender("");
         }
       })
     }
@@ -88,6 +89,9 @@ class Group extends Component {
 
   }
   showInviteMember =() =>{
+    if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
+      return this.props.rerender("You are not authorized to do that");
+    }
     $('#toggle-invite-member').addClass('d-none');
     $('#invite-member').removeClass('d-none');
   }
@@ -96,6 +100,9 @@ class Group extends Component {
     $('#toggle-invite-member').removeClass('d-none');
   }
   showCreateGroceryList =() =>{
+    if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
+      return this.props.rerender("You are not authorized to do that");
+    }
     $('#toggle-create-grocery-list').addClass('d-none');
     $('#create-grocery-list').removeClass('d-none');
   }
@@ -125,9 +132,6 @@ class Group extends Component {
   }
   editGroupName(){
     if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
-      // this.setState({
-      //   messege: "You are not authorized to do that"
-      // });
       return this.props.rerender("You are not authorized to do that");
     }
     let editGroupName = this.refEditGroupName.current.value;
@@ -165,7 +169,6 @@ class Group extends Component {
       }
     })
   }
-
   leaveGroup = () =>{
     if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
       // this.setState({
@@ -197,6 +200,9 @@ class Group extends Component {
 
   }
   addMemberToGroup = (e) => {
+    if(!this.props.appModel.userModel.isPartOfGroup(this.state.groupData)){
+      return this.props.rerender("You are not authorized to do that");
+    }
     let addUsername = this.refAddMemberUsername.current.value;
     if(!addUsername){
       // this.setState({

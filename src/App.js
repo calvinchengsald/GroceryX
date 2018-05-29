@@ -20,8 +20,8 @@ class App extends Component {
     this.customComponent = new Object();
     this.setupCustomComponent();
     this.state={
-        messege:"welcome",
-        loading:true
+        loading:true,
+        messege:'-'
     };
 
   }
@@ -71,7 +71,7 @@ class App extends Component {
     }
     else {
       this.setState({
-
+        messege: '-'
       });
     }
   }
@@ -101,6 +101,7 @@ class App extends Component {
             <main className='col-10'>
                 <Messege
                   messege = {this.state.messege}
+                  rerender={(msg)=>this.rerender(msg)}
                 />
              <Route exact path="/" component={Landing} />
              <Route path="/Profile/:id" render={this.customComponent.profile} />

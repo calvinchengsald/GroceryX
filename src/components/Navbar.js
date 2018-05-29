@@ -12,7 +12,7 @@ class Navbar extends Component {
 
   signOut = () =>{
     this.props.appModel.userModel.signOut();
-    this.props.rerender("Sucessfully Signed Out");
+    this.props.rerender("");
   }
 
   render() {

@@ -5,20 +5,21 @@ import $ from "jquery";
 class Messege extends Component {
   constructor(props){
     super(props);
-    this.prevMessege = this.props.messege;
   }
 
   handleClose = () => {
     $('#messege').slideUp();
-    this.prevMessege = "";
+    this.props.rerender("-");
   }
 
   componentDidMount(){
     $('#messege').slideUp(0);
   }
   componentDidUpdate(){
-    if(this.prevMessege !== this.props.messege){
-      this.prevMessege = this.props.messege;
+    if(this.props.messege === "-"){
+      $('#messege').slideUp(0);
+    }
+    else {
       $('#messege').slideDown();
     }
   }

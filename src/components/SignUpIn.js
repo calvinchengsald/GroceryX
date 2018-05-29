@@ -25,6 +25,8 @@ class SignUpIn extends Component {
     if(this.props.appModel.userModel.login){
       this.props.history.push('/');
     }
+
+    return this.props.rerender("");
   }
   handleSignIn = () => {
     if(this.props.appModel.userModel.login){
@@ -165,11 +167,11 @@ class SignUpIn extends Component {
               </div>
               <div className='row'>
                 <div className='col-3 offset-1'>Username: </div>
-                <input defaultValue="synthesize" placeholder='Username' ref={this.refSignInUsername} type='text' className='col-5 offset-1'/>
+                <input type='text' defaultValue="hack" placeholder='Username' ref={this.refSignInUsername}  className='col-5 offset-1'/>
               </div>
               <div className='row'>
                 <div className='col-3 offset-1'>Password: </div>
-                <input type='password' defaultValue="password" placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1'/>
+                <input type='password' defaultValue="password1" placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1'/>
               </div>
               <div className='row justify-content-center'>
                 <div className='btn btn-primary' onClick={this.handleSignIn}> Sign In </div>
