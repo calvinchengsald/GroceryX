@@ -1,7 +1,6 @@
 
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom';
-import Messege from './Messege';
 import $ from "jquery";
 
 class Group extends Component {
@@ -10,11 +9,10 @@ class Group extends Component {
   constructor(props){
     super(props);
     this.base = process.env.REACT_APP_API_URL;
-    this.state=({
+    this.state={
       loading: true,
       groupView: false,
-    })
-    this.groupId;
+    };
     this.initialize();
   }
   initialize(){
@@ -33,7 +31,7 @@ class Group extends Component {
     if(this.props.match.params.groupId){
       this.groupId = this.props.match.params.groupId;
       let myurl = `${process.env.REACT_APP_API_URL}group/${this.groupId}`;
-      let bodyFormData = new Object();
+      let bodyFormData = {};
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
@@ -159,7 +157,7 @@ class Group extends Component {
       return this.props.rerender("Please enter a valid group name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}group/update/${this.state.groupData.id}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.groupName = editGroupName;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
@@ -190,16 +188,12 @@ class Group extends Component {
       return this.props.rerender("You are not a part of this group");
     }
     let myurl = `${process.env.REACT_APP_API_URL}groupUser/leave`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.userId = this.props.appModel.userModel.id;
     bodyFormData.groupId = this.state.groupData.id;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        // this.setState({
-        //   messege: err,
-        //   groupView: true,
-        // });
         return this.props.rerender(err);
       }
       else {
@@ -226,7 +220,7 @@ class Group extends Component {
       return this.props.rerender("Please enter a valid username");
     }
     let myurl = `${process.env.REACT_APP_API_URL}user/search/username/${addUsername}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
@@ -241,7 +235,7 @@ class Group extends Component {
           return this.props.rerender(data.error);
         }
         let myurl = `${process.env.REACT_APP_API_URL}groupUser/create`;
-        let bodyFormData = new Object();
+        let bodyFormData = {};
         bodyFormData.needJSONbreakup = "J$0nBr4k3";
         bodyFormData.userId = data.id;
         bodyFormData.groupId = this.state.groupData.id;
@@ -277,7 +271,7 @@ class Group extends Component {
       return this.props.rerender("Please enter a valid group name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}group/create`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.groupName = createGroupName;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
@@ -297,7 +291,7 @@ class Group extends Component {
           return this.props.rerender(data.error);
         }
         let myurl = `${process.env.REACT_APP_API_URL}groupUser/create`;
-        let bodyFormData = new Object();
+        let bodyFormData = {};
         bodyFormData.needJSONbreakup = "J$0nBr4k3";
         bodyFormData.userId = this.props.appModel.userModel.userData.id;
         bodyFormData.groupId = data.id;
@@ -337,7 +331,7 @@ class Group extends Component {
       return this.props.rerender("Please enter a valid list name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}groceryList/create`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.name = addGroceryListName;
     bodyFormData.groupId = this.state.groupData.id;
@@ -357,13 +351,10 @@ class Group extends Component {
   }
   reloadGroupData(){
     let myurl = `${process.env.REACT_APP_API_URL}group/${this.groupId}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
-        // this.setState({
-        //   groupData : data,
-        // });
         return this.props.rerender(err);
       }
       else {
@@ -372,6 +363,9 @@ class Group extends Component {
         }
         this.setState({
           groupData : data,
+        });
+        return this.props.appModel.userModel.updateUserData(()=>{
+          this.props.rerender("~");
         });
       }
     })

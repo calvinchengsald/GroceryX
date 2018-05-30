@@ -23,14 +23,14 @@ class UserModel {
       if(groupuser.user.id === this.userData.id){
         ultBool = true;
       }
-      return;
+      return 1;
     });
     return ultBool;
   }
 
   updateUserData(callback){
     let myurl = `${process.env.REACT_APP_API_URL}user/${this.userData.id}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){

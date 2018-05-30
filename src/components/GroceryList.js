@@ -1,7 +1,5 @@
 
 import React, { Component } from 'react';
-import {Link} from 'react-router-dom';
-import Messege from './Messege';
 import GroceryListItem from './GroceryListItem';
 import $ from 'jquery';
 
@@ -11,10 +9,9 @@ class GroceryList extends Component {
   constructor(props){
     super(props);
     this.base = process.env.REACT_APP_API_URL;
-    this.state=({
+    this.state={
       loading: true,
-    })
-    this.groceryListId;
+    };
     this.initialize();
   }
   initialize(){
@@ -73,7 +70,7 @@ class GroceryList extends Component {
     else if (this.props.appModel.userModel.isPartOfGroceryList(this.state.groceryListData)){
       //delete the Item
       let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/delete/${id}`;
-      let bodyFormData = new Object();
+      let bodyFormData = {};
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
       this.fetchData(myurl,bodyFormData, (err,data)=>{
         if(err){
@@ -106,7 +103,7 @@ class GroceryList extends Component {
     if(thisData.purchased){    //checked
       if(thisData.userId && thisData.userId == this.props.appModel.userModel.id){
         let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${id}`;
-        let bodyFormData = new Object();
+        let bodyFormData = {};
         bodyFormData.purchased=false;
         bodyFormData.needJSONbreakup = "J$0nBr4k3";
         this.fetchData(myurl,bodyFormData, (err,data)=>{
@@ -127,7 +124,7 @@ class GroceryList extends Component {
     }
     else {
       let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${id}`;
-      let bodyFormData = new Object();
+      let bodyFormData = {};
       bodyFormData.purchased=true;
       bodyFormData.userId = this.props.appModel.userModel.id;
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
@@ -149,7 +146,7 @@ class GroceryList extends Component {
   }
   updateList(){
     let myurl = `${process.env.REACT_APP_API_URL}groceryList/${this.groceryListId}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
@@ -181,7 +178,7 @@ class GroceryList extends Component {
     if(confirm){
       if(this.state.groceryListData.ownerId === this.props.appModel.userModel.id){
         let myurl = `${process.env.REACT_APP_API_URL}groceryList/delete/${this.state.groceryListData.id}`;
-        let bodyFormData = new Object();
+        let bodyFormData = {};
         bodyFormData.needJSONbreakup = "J$0nBr4k3";
         this.fetchData(myurl,bodyFormData, (err,data)=>{
           if(err){
@@ -205,8 +202,11 @@ class GroceryList extends Component {
     }
   }
   togglePrivate = (e) =>{
+    if(this.state.groceryListData.ownerId !== this.props.appModel.userModel.id){
+      return this.props.rerender("You are not authorized to do that");
+    }
     let myurl = `${process.env.REACT_APP_API_URL}groceryList/update/${this.state.groceryListData.id}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.private = !this.state.groceryListData.private;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
@@ -269,7 +269,7 @@ class GroceryList extends Component {
       return this.props.rerender("Please enter a valid list name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}groceryList/update/${this.state.groceryListData.id}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.name = editGroceryListName;
     this.fetchData(myurl,bodyFormData, (err,data)=>{
@@ -281,6 +281,7 @@ class GroceryList extends Component {
           return this.props.rerender(data.error);
         }
         this.updateList();
+
       }
     })
   }
@@ -292,7 +293,7 @@ class GroceryList extends Component {
       return this.props.rerender("You must include an Item Name");
     }
     let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/create`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.name = itemName;
     bodyFormData.priority = itemPriority;
@@ -312,6 +313,10 @@ class GroceryList extends Component {
         }
         this.updateList();
         this.hideAddItem();
+
+        $('#name-select').val("");
+        $('#budget-select').val("");
+        $('#priority-select').val(0);
       }
     })
   }
@@ -324,7 +329,7 @@ class GroceryList extends Component {
       return callback(false);
     }
     let myurl = `${process.env.REACT_APP_API_URL}groceryListItem/update/${id}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.name = itemName;
     bodyFormData.priority = itemPriority;
@@ -385,13 +390,13 @@ class GroceryList extends Component {
 
                     </div>
                     <div className='row justify-content-center'>
-                        <div className={`btn btn-danger m-0 font-3` + (this.props.appModel.userModel.userData.id === this.state.groceryListData.ownerId?'':'d-none')} onClick={this.deleteGroceryListWarning}>
+                        <div className={`btn btn-danger m-0 font-3 ` + (this.props.appModel.userModel.userData.id === this.state.groceryListData.ownerId?'':'d-none')} onClick={this.deleteGroceryListWarning}>
                           Delete
                         </div>
                       <div className=' col-4 font-3' >
                         By {this.state.groceryListData.owner.name}
                       </div>
-                      <div className={`btn btn-secondary m-0 font-3` + (this.props.appModel.userModel.userData.id === this.state.groceryListData.ownerId?'':'d-none')} onClick={this.togglePrivate} >
+                      <div className={`btn btn-secondary m-0 font-3 ` + (this.props.appModel.userModel.userData.id === this.state.groceryListData.ownerId?'':'d-none')} onClick={this.togglePrivate} >
                         {this.state.groceryListData.private?"Set Public":"Set Private"}
                       </div>
                     </div>

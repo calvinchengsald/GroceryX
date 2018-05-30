@@ -7,9 +7,6 @@ import '../css/App.css';
 
 class Navbar extends Component {
 
-  constructor(props){
-    super(props);
-  }
 
   signOut = () =>{
     this.props.appModel.userModel.signOut();

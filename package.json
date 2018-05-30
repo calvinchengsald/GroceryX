@@ -2,6 +2,7 @@
   "name": "groceryx",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://groceryx.s3-website-us-east-1.amazonaws.com",
   "dependencies": {
     "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",

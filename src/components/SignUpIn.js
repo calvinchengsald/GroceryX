@@ -1,6 +1,5 @@
 
 import React, { Component } from 'react';
-import Messege from './Messege';
 //import bcrypt from 'bcryptjs';
 import '../css/App.css';
 
@@ -40,9 +39,9 @@ class SignUpIn extends Component {
     }
     else {
       let myurl = `${this.base}user/signIn`;
-      let bodyFormData = new Object();
+      let bodyFormData = {};
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
-      bodyFormData.username = this.refSignInUsername.current.value;
+      bodyFormData.username = this.refSignInUsername.current.value.toLowerCase();
   //    bodyFormData.password = bcrypt.hashSync(this.refSignInPassword.current.value, this.salt);
       bodyFormData.password = this.refSignInPassword.current.value;
       this.fetchData(myurl,bodyFormData, (err,data)=>{
@@ -94,9 +93,9 @@ class SignUpIn extends Component {
     }
     else {
       let myurl = `${this.base}user/create`;
-      let bodyFormData = new Object();
+      let bodyFormData = {};
       bodyFormData.needJSONbreakup = "J$0nBr4k3";
-      bodyFormData.username = this.refSignUpUsername.current.value;
+      bodyFormData.username = this.refSignUpUsername.current.value.toLowerCase();
       //bodyFormData.password =   bcrypt.hashSync(this.refSignUpPassword.current.value,this.salt);
       bodyFormData.password =   this.refSignUpPassword.current.value;
       bodyFormData.name = this.refSignUpName.current.value;

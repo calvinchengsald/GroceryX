@@ -1,6 +1,5 @@
 
 import React, { Component } from 'react';
-import Messege from './Messege';
 import {Link} from 'react-router-dom';
 import $ from "jquery";
 
@@ -17,7 +16,7 @@ class Profile extends Component {
   }
   initializeUser(){
     let myurl = `${process.env.REACT_APP_API_URL}user/${this.props.match.params.id}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
@@ -39,7 +38,7 @@ class Profile extends Component {
   }
   reloadUser(){
     let myurl = `${process.env.REACT_APP_API_URL}user/${this.props.match.params.id}`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     this.fetchData(myurl,bodyFormData, (err,data)=>{
       if(err){
@@ -120,7 +119,7 @@ class Profile extends Component {
     }
     let oldPassword = $('#confirm-password').val();
     let myurl = `${process.env.REACT_APP_API_URL}user/update/${this.props.appModel.userModel.userData.id}/password`;
-    let bodyFormData = new Object();
+    let bodyFormData = {};
     bodyFormData.needJSONbreakup = "J$0nBr4k3";
     bodyFormData.oldPassword = oldPassword;
     bodyFormData.newPassword = newPassword;
@@ -164,7 +163,6 @@ class Profile extends Component {
       return this.props.rerender("You need to sign in first");
     }
     $('#change-password-form').removeClass('d-none');
-
     $("#change-password-btn").slideUp('400', function(){
         $("#change-password-form").slideDown();
     });
@@ -197,8 +195,8 @@ class Profile extends Component {
                   <div className='col-12  text-left font-3'>Username: {this.state.userProfile.username} </div>
                 </div>
                 <div className='row'>
-                  <div id='change-password-btn font-3' onClick={this.showChangePassword} className={`col-12  btn btn-secondary text-left `+((this.props.appModel.userModel.login && this.props.appModel.userModel.userData.id==this.props.match.params.id)? '' : ' d-none')} onClick={this.showChangePassword} >Change Password </div>
-                  <div id='change-password-form font-3' onMouseLeave={this.hideChangePassword} className='col-12 d-none' >
+                  <div id='change-password-btn' onClick={this.showChangePassword} className={`col-12  btn btn-secondary text-left  font-3 `+((this.props.appModel.userModel.login && this.props.appModel.userModel.userData.id==this.props.match.params.id)? '' : ' d-none')} onClick={this.showChangePassword} >Change Password </div>
+                  <div id='change-password-form' onMouseLeave={this.hideChangePassword} className='col-12 d-none  font-3' >
                     <div className='row'>
                       <input type='password' id='confirm-password' className='col-6 font-2' placeholder="Password"/>
                     </div>

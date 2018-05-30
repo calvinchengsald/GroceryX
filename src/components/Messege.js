@@ -3,9 +3,6 @@ import React, { Component } from 'react';
 import $ from "jquery";
 
 class Messege extends Component {
-  constructor(props){
-    super(props);
-  }
 
   handleClose = () => {
     $('#messege').slideUp();

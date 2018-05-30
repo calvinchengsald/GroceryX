@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './css/App.css';
-import { Route, Link } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import Landing from './components/Landing';
 import SignUpIn from './components/SignUpIn';
 import Profile from './components/Profile';
@@ -11,14 +10,14 @@ import Navbar from './components/Navbar';
 import AppModel from './model/AppModel';
 import Messege from './components/Messege';
 import $ from 'jquery';
-require('dotenv').config();
+require('./dotenv').config();
 
 class App extends Component {
 
   constructor(props){
     super(props);
     this.appModel = new AppModel();
-    this.customComponent = new Object();
+    this.customComponent = {};
     this.setupCustomComponent();
     this.state={
         loading:true,
@@ -130,7 +129,7 @@ class App extends Component {
         <div className='container-fluid'>
           <div className='row img-holder'>
             <div className='col-12 bg-dark justify-content-center border border-bottom-4'>
-              <img className='img-fluid' src={`./GroceryX.png`} alt={`logo`}/>
+              <img className='img-fluid' src={`/GroceryX.png`} alt={`logo`}/>
             </div>
 
           </div>
