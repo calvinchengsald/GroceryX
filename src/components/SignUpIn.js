@@ -165,11 +165,11 @@ class SignUpIn extends Component {
               </div>
               <div className='row'>
                 <div className='col-3 offset-1 font-2'>Username: </div>
-                <input type='text' defaultValue="hack" placeholder='Username' ref={this.refSignInUsername}  className='col-5 offset-1 font-2'/>
+                <input type='text' placeholder='Username' ref={this.refSignInUsername}  className='col-5 offset-1 font-2'/>
               </div>
               <div className='row'>
                 <div className='col-3 offset-1 font-2'>Password: </div>
-                <input type='password' defaultValue="card" placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1 font-2'/>
+                <input type='password' placeholder='Password' ref={this.refSignInPassword}  className='col-5 offset-1 font-2'/>
               </div>
               <div className='row justify-content-center'>
                 <div className='btn btn-primary  font-3' onClick={this.handleSignIn}> Sign In </div>

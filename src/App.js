@@ -27,6 +27,16 @@ class App extends Component {
 
   }
   setupCustomComponent(comp){
+    this.customComponent.landing = (props) => {
+      return (
+        <Landing
+          appModel = {this.appModel}
+          rerender = {(msg) => this.rerender(msg)}
+          hideSidebar = {()=>this.hideSidebar()}
+          {...props}
+        />
+      );
+    };
     this.customComponent.profile = (props) => {
       return (
         <Profile
@@ -118,6 +128,12 @@ class App extends Component {
     return (
       <div className="App">
         <div className='container-fluid'>
+          <div className='row img-holder'>
+            <div className='col-12 bg-dark justify-content-center border border-bottom-4'>
+              <img className='img-fluid' src={`./GroceryX.png`} alt={`logo`}/>
+            </div>
+
+          </div>
           <div className='row'>
             <div className='d-none d-md-block col-2'>
               <Navbar
@@ -138,7 +154,7 @@ class App extends Component {
                   messege = {this.state.messege}
                   rerender={(msg)=>this.rerender(msg)}
                 />
-             <Route exact path="/" component={Landing} />
+             <Route exact path="/" component={this.customComponent.landing} />
              <Route path="/Profile/:id" render={this.customComponent.profile} />
              <Route path="/SignUpIn" render={this.customComponent.signUpIn} />
              <Route path="/Group/:groupId" render={this.customComponent.group} />

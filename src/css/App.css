@@ -38,6 +38,23 @@
   z-index: 10;
   font-size: 7vw;
 }
+
+.img-holder{
+  overflow:auto;
+}
+.img-fluid{
+  width:auto;
+  height:auto;
+  align-self : center;
+}
+@media screen and (min-width: 1000px) {
+  .img-fluid{
+    width:1000px;
+    height:auto;
+    align-self : center;
+  }
+}
+
 a {
   color: black;
 }
