@@ -148,6 +148,7 @@ class SignUpIn extends Component {
       return callback(null, data);
     })
     .catch((error) =>{
+      console.log(error);
       return callback("Something went wrong with the server");
 
     });

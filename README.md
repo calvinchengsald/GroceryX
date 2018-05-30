@@ -1,4 +1,6 @@
 
+
+
 GroceryX - UI for creating and managing grocery List
 
 User must be signed in to interact with the client
@@ -22,3 +24,7 @@ Grocery List -
 User -
   -Only the user can change his Password
   -Anyone can view anyone elses profile
+
+.env
+  REACT_APP_API_URL = [URL of the API]
+  expample : REACT_APP_API_URL="https://groceryx-server.herokuapp.com/"
