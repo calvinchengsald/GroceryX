@@ -20,7 +20,7 @@ class GroceryList extends Component {
 
 
   componentDidMount() {
-
+	//mounting
     if(this.props.match.params.groceryListId){
       this.groceryListId = this.props.match.params.groceryListId;
       this.updateList();
